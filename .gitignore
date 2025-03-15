@@ -15,9 +15,7 @@ landa.pk/node_modules/
 !.yarn/versions
 
 # Environment files
-.env*
-server/.env*
-landa.pk/.env*
+
 
 # Next.js files
 /.next/
