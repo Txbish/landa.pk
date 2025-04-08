@@ -7,12 +7,17 @@ const userSchema = new mongoose.Schema(
     password: { type: String, required: true },
     role: {
       type: String,
-      enum: ["user", "seller", "admin"],
+      enum: ["user", "seller"],
       default: "user",
     },
     isBlocked: { type: Boolean, default: false },
     address: { type: String },
     phone: { type: String },
+    profileImage: { type: String, default: "" },
+    sellerDetails: {
+      businessName: { type: String, default: "" },
+      earnings: { type: Number, default: 0 },
+    },
   },
   { timestamps: true }
 );
