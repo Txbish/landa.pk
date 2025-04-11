@@ -8,11 +8,14 @@ const {
   updateOrderStatus,
 } = require("../controllers/orderController");
 
-router.route("/").get(protect, getAllOrders).post(authenticate, createOrder);
+router
+  .route("/")
+  .get(authenticate, getAllOrders)
+  .post(authenticate, createOrder);
 
 router
   .route("/:id")
-  .get(protect, getOrderById)
+  .get(authenticate, getOrderById)
   .put(authenticate, updateOrderStatus);
 
 module.exports = router;

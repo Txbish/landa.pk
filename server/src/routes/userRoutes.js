@@ -7,7 +7,7 @@ const {
   loginUser,
   registerUser,
 } = require("../controllers/userController");
-const authenticate = require("../middleware/auth");
+const { authenticate } = require("../middleware/auth");
 
 router.route("/profile").get(authenticate, getUserProfile);
 
