@@ -43,6 +43,8 @@ jest.config.js
 logs/
 *.log.*
 
+.env
+
 # Debug files
 npm-debug.log*
 yarn-debug.log*
