@@ -9,7 +9,7 @@ const cookieParser = require("cookie-parser");
 const userRoutes = require("./routes/userRoutes");
 const orderRoutes = require("./routes/orderRoutes");
 const productRoutes = require("./routes/productRoutes");
-
+const { seedAdmin } = require("./utils/seedAdmin");
 dotenv.config();
 
 const app = express();
@@ -59,3 +59,5 @@ mongoose
     console.error("MongoDB connection failed:", err.message);
     process.exit(1); // Exit process with failure
   });
+
+seedAdmin();
