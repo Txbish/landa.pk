@@ -26,7 +26,7 @@ const createSellerRequest = asyncHandler(async (req, res) => {
   res.status(201).json(sellerRequest);
 });
 
-const updateSellerRequestStatus = asyncHandler(async (req, res) => {
+const handleSellerRequest = asyncHandler(async (req, res) => {
   const { status } = req.body;
 
   const sellerRequest = await SellerRequest.findById(req.params.id);
@@ -44,5 +44,5 @@ const updateSellerRequestStatus = asyncHandler(async (req, res) => {
 module.exports = {
   getSellerRequests,
   createSellerRequest,
-  updateSellerRequestStatus,
+  handleSellerRequest,
 };

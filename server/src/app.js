@@ -9,6 +9,7 @@ const cookieParser = require("cookie-parser");
 const userRoutes = require("./routes/userRoutes");
 const orderRoutes = require("./routes/orderRoutes");
 const productRoutes = require("./routes/productRoutes");
+const sellerRequestRoutes = require("./routes/sellerRequestRoutes");
 const { seedAdmin } = require("./utils/seed");
 
 dotenv.config();
@@ -40,6 +41,7 @@ app.use(morgan(process.env.NODE_ENV === "development" ? "dev" : "combined"));
 app.use("/api/products", productRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/seller-requests", sellerRequestRoutes);
 
 // === Default Route ===
 app.get("/", (req, res) => {

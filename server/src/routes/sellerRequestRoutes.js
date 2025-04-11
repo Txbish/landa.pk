@@ -5,7 +5,7 @@ const {
   getSellerRequests,
   handleSellerRequest,
 } = require("../controllers/sellerRequestController");
-const { authenticate, admin } = require("../middleware/authMiddleware");
+const { authenticate, admin } = require("../middleware/auth");
 
 const router = express.Router();
 
