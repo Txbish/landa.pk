@@ -6,16 +6,7 @@ import Image from "next/image";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-
-interface Product {
-  _id: string;
-  title: string;
-  description: string;
-  price: number;
-  category: string;
-  image: string;
-  isAvailable: boolean;
-}
+import { Product } from "@/lib/types";
 
 interface ProductShowcaseProps {
   products: Product[];

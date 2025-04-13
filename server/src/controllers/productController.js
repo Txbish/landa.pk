@@ -1,23 +1,29 @@
 const asyncHandler = require("express-async-handler");
 const Product = require("../models/Product");
 
-const getAllProducts = asyncHandler(async (req, res) => {
-  const products = await Product.find({}).populate("seller", "name email"); // Optional: populate seller info
+const getProducts = asyncHandler(async (req, res) => {
+  const { category, minPrice, maxPrice, sortBy, order, search, limit } =
+    req.query;
+
+  const query = {};
+  if (category) query.category = category;
+  if (minPrice) query.price = { ...query.price, $gte: Number(minPrice) };
+  if (maxPrice) query.price = { ...query.price, $lte: Number(maxPrice) };
+  if (search) query.title = { $regex: search, $options: "i" }; // Case-insensitive search
+
+  const sort = {};
+  if (sortBy) sort[sortBy] = order === "desc" ? -1 : 1;
+
+  let productsQuery = Product.find(query)
+    .sort(sort)
+    .populate("seller", "name email");
+
+  if (limit) {
+    productsQuery = productsQuery.limit(Number(limit));
+  }
+
   res.status(200).json(products);
 });
-
-const getProductById = asyncHandler(async (req, res) => {
-  const product = await Product.findById(req.params.id).populate(
-    "seller",
-    "name email"
-  );
-  if (!product) {
-    res.status(404);
-    throw new Error("Product not found");
-  }
-  res.status(200).json(product);
-});
-
 const createProduct = asyncHandler(async (req, res) => {
   const { title, description, price, category, image, quantity, isAvailable } =
     req.body;
@@ -72,7 +78,7 @@ const deleteProduct = asyncHandler(async (req, res) => {
 
 module.exports = {
   getAllProducts,
-  getProductById,
+  getProducts,
   createProduct,
   updateProduct,
   deleteProduct,

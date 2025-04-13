@@ -56,7 +56,6 @@
     --color-white: #fff;
     --spacing: 0.25rem;
     --container-sm: 24rem;
-    --container-md: 28rem;
     --container-xl: 36rem;
     --container-3xl: 48rem;
     --text-xs: 0.75rem;
@@ -569,14 +568,8 @@
   .max-w-3xl {
     max-width: var(--container-3xl);
   }
-  .max-w-\[600px\] {
-    max-width: 600px;
-  }
   .max-w-\[700px\] {
     max-width: 700px;
-  }
-  .max-w-md {
-    max-width: var(--container-md);
   }
   .max-w-xl {
     max-width: var(--container-xl);
@@ -865,9 +858,6 @@
   .bg-destructive {
     background-color: var(--destructive);
   }
-  .bg-muted {
-    background-color: var(--muted);
-  }
   .bg-primary {
     background-color: var(--primary);
   }
@@ -1010,6 +1000,9 @@
   }
   .text-primary-foreground {
     color: var(--primary-foreground);
+  }
+  .text-red-500 {
+    color: var(--color-red-500);
   }
   .text-secondary-foreground {
     color: var(--secondary-foreground);
@@ -1250,34 +1243,6 @@
   .zoom-out {
     --tw-exit-scale: 0;
   }
-  .file\:border-0 {
-    &::file-selector-button {
-      border-style: var(--tw-border-style);
-      border-width: 0px;
-    }
-  }
-  .file\:bg-transparent {
-    &::file-selector-button {
-      background-color: transparent;
-    }
-  }
-  .file\:text-sm {
-    &::file-selector-button {
-      font-size: var(--text-sm);
-      line-height: var(--tw-leading, var(--text-sm--line-height));
-    }
-  }
-  .file\:font-medium {
-    &::file-selector-button {
-      --tw-font-weight: var(--font-weight-medium);
-      font-weight: var(--font-weight-medium);
-    }
-  }
-  .placeholder\:text-muted-foreground {
-    &::placeholder {
-      color: var(--muted-foreground);
-    }
-  }
   .hover\:scale-105 {
     &:hover {
       @media (hover: hover) {
@@ -1442,11 +1407,6 @@
       pointer-events: none;
     }
   }
-  .disabled\:cursor-not-allowed {
-    &:disabled {
-      cursor: not-allowed;
-    }
-  }
   .disabled\:opacity-50 {
     &:disabled {
       opacity: 50%;
@@ -1582,12 +1542,6 @@
   .sm\:flex-row {
     @media (width >= 40rem) {
       flex-direction: row;
-    }
-  }
-  .sm\:text-4xl {
-    @media (width >= 40rem) {
-      font-size: var(--text-4xl);
-      line-height: var(--tw-leading, var(--text-4xl--line-height));
     }
   }
   .sm\:text-5xl {
