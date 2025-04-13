@@ -7,3 +7,9 @@ export interface Product {
     image: string;
     isAvailable: boolean;
 }
+export interface PaginatedProductsResponse {
+  products: Product[];
+  totalPages: number;
+  currentPage: number;
+  totalProducts: number;
+}

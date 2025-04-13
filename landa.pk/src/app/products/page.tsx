@@ -1,129 +1,93 @@
-import type { Metadata } from "next";
 import Link from "next/link";
-import Image from "next/image";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import Footer from "@/components/footer";
-
-export const metadata: Metadata = {
-  title: "All Products | Elegance",
-  description: "Browse our complete collection of modern fashion and clothing",
-};
-
-// Mock product data based on the provided schema
-const products = [
-  {
-    _id: "1",
-    title: "Premium Cotton T-Shirt",
-    description: "Soft, breathable cotton t-shirt perfect for everyday wear",
-    price: 29.99,
-    category: "T-Shirts",
-    image: "/placeholder.svg?height=400&width=300",
-    isAvailable: true,
-  },
-  {
-    _id: "2",
-    title: "Slim Fit Jeans",
-    description: "Classic slim fit jeans with a modern touch",
-    price: 59.99,
-    category: "Jeans",
-    image: "/placeholder.svg?height=400&width=300",
-    isAvailable: true,
-  },
-  {
-    _id: "3",
-    title: "Casual Linen Shirt",
-    description: "Lightweight linen shirt for a casual yet sophisticated look",
-    price: 45.99,
-    category: "Shirts",
-    image: "/placeholder.svg?height=400&width=300",
-    isAvailable: true,
-  },
-  {
-    _id: "4",
-    title: "Wool Blend Sweater",
-    description: "Warm and comfortable wool blend sweater for colder days",
-    price: 79.99,
-    category: "Sweaters",
-    image: "/placeholder.svg?height=400&width=300",
-    isAvailable: true,
-  },
-  {
-    _id: "5",
-    title: "Designer Jacket",
-    description: "Stylish designer jacket to elevate your outfit",
-    price: 129.99,
-    category: "Jackets",
-    image: "/placeholder.svg?height=400&width=300",
-    isAvailable: true,
-  },
-  {
-    _id: "6",
-    title: "Graphic Print T-Shirt",
-    description: "Bold graphic print t-shirt for a statement look",
-    price: 34.99,
-    category: "T-Shirts",
-    image: "/placeholder.svg?height=400&width=300",
-    isAvailable: true,
-  },
-  {
-    _id: "7",
-    title: "Relaxed Fit Chinos",
-    description: "Comfortable relaxed fit chinos for a casual look",
-    price: 49.99,
-    category: "Pants",
-    image: "/placeholder.svg?height=400&width=300",
-    isAvailable: true,
-  },
-  {
-    _id: "8",
-    title: "Formal Dress Shirt",
-    description: "Elegant formal dress shirt for special occasions",
-    price: 65.99,
-    category: "Shirts",
-    image: "/placeholder.svg?height=400&width=300",
-    isAvailable: true,
-  },
-  {
-    _id: "9",
-    title: "Knit Cardigan",
-    description: "Cozy knit cardigan for layering in cooler weather",
-    price: 69.99,
-    category: "Sweaters",
-    image: "/placeholder.svg?height=400&width=300",
-    isAvailable: true,
-  },
-  {
-    _id: "10",
-    title: "Leather Bomber Jacket",
-    description: "Classic leather bomber jacket for a timeless look",
-    price: 199.99,
-    category: "Jackets",
-    image: "/placeholder.svg?height=400&width=300",
-    isAvailable: true,
-  },
-  {
-    _id: "11",
-    title: "Striped Polo Shirt",
-    description: "Classic striped polo shirt for a smart casual look",
-    price: 39.99,
-    category: "T-Shirts",
-    image: "/placeholder.svg?height=400&width=300",
-    isAvailable: true,
-  },
-  {
-    _id: "12",
-    title: "Distressed Denim Jeans",
-    description: "Trendy distressed denim jeans for an edgy look",
-    price: 69.99,
-    category: "Jeans",
-    image: "/placeholder.svg?height=400&width=300",
-    isAvailable: true,
-  },
-];
+import { Button } from "@/components/ui/button";
+import { Product } from "@/lib/types";
+import { useEffect, useState } from "react";
+import { fetchProducts } from "../services/productService";
+import ProductShowcase from "@/components/product-showcase"; // Import ProductShowcase
 
 export default function ProductsPage() {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Filters and pagination state
+  const [category, setCategory] = useState<string | null>(null);
+  const [search, setSearch] = useState<string>("");
+  const [sortBy, setSortBy] = useState<string>("price");
+  const [order, setOrder] = useState<"asc" | "desc">("asc");
+  const [minPrice, setMinPrice] = useState<number | null>(null);
+  const [maxPrice, setMaxPrice] = useState<number | null>(null);
+  const [page, setPage] = useState<number>(1);
+  const [limit] = useState<number>(10); // Fixed limit per page
+  const [totalPages, setTotalPages] = useState<number>(0);
+
+  // Fetch products whenever filters or pagination state changes
+  useEffect(() => {
+    async function loadProducts() {
+      try {
+        setLoading(true);
+        const response = await fetchProducts({
+          category,
+          search,
+          sortBy,
+          order,
+          minPrice,
+          maxPrice,
+          page,
+          limit,
+        });
+        setProducts(response.products); // Assuming API returns { products, totalPages }
+        setTotalPages(response.totalPages);
+      } catch (err: any) {
+        setError(err.response?.data?.message || "Failed to fetch products");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadProducts();
+  }, [category, search, sortBy, order, minPrice, maxPrice, page, limit]);
+
+  // Handlers for filters and pagination
+  const handleCategoryChange = (newCategory: string | null) => {
+    setCategory(newCategory);
+    setPage(1); // Reset to first page
+  };
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearch(e.target.value);
+    setPage(1); // Reset to first page
+  };
+
+  const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSortBy(e.target.value);
+    setPage(1); // Reset to first page
+  };
+
+  const handleOrderChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setOrder(e.target.value as "asc" | "desc");
+    setPage(1); // Reset to first page
+  };
+
+  const handlePriceChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    type: "min" | "max"
+  ) => {
+    const value = e.target.value ? Number(e.target.value) : null;
+    if (type === "min") setMinPrice(value);
+    if (type === "max") setMaxPrice(value);
+    setPage(1); // Reset to first page
+  };
+
+  const handleNextPage = () => {
+    if (page < totalPages) setPage((prev) => prev + 1);
+  };
+
+  const handlePreviousPage = () => {
+    if (page > 1) setPage((prev) => prev - 1);
+  };
+
   return (
     <div className="flex min-h-screen flex-col">
       <main className="flex-1">
@@ -138,70 +102,102 @@ export default function ProductsPage() {
             </p>
           </div>
 
+          {/* Filters */}
           <div className="flex flex-wrap gap-4 mb-8">
-            <Button variant="outline" className="rounded-full">
+            <Button
+              variant={category === null ? "default" : "outline"}
+              className="rounded-full"
+              onClick={() => handleCategoryChange(null)}
+            >
               All
             </Button>
-            <Button variant="outline" className="rounded-full">
-              T-Shirts
-            </Button>
-            <Button variant="outline" className="rounded-full">
-              Jeans
-            </Button>
-            <Button variant="outline" className="rounded-full">
-              Shirts
-            </Button>
-            <Button variant="outline" className="rounded-full">
-              Sweaters
-            </Button>
-            <Button variant="outline" className="rounded-full">
-              Jackets
-            </Button>
-            <Button variant="outline" className="rounded-full">
-              Pants
-            </Button>
+            {[
+              "T-Shirts",
+              "Jeans",
+              "Shirts",
+              "Sweaters",
+              "Jackets",
+              "Pants",
+            ].map((cat) => (
+              <Button
+                key={cat}
+                variant={category === cat ? "default" : "outline"}
+                className="rounded-full"
+                onClick={() => handleCategoryChange(cat)}
+              >
+                {cat}
+              </Button>
+            ))}
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {products.map((product) => (
-              <Link
-                href={`/products/${product._id}`}
-                key={product._id}
-                className="block"
-              >
-                <Card className="h-full overflow-hidden transition-all duration-300 hover:shadow-lg">
-                  <div className="relative aspect-[3/4] overflow-hidden">
-                    <Image
-                      src={product.image || "/placeholder.svg"}
-                      alt={product.title}
-                      fill
-                      className="object-cover transition-transform duration-500 ease-in-out hover:scale-105"
-                    />
-                    {product.category && (
-                      <Badge className="absolute top-3 left-3 z-10">
-                        {product.category}
-                      </Badge>
-                    )}
-                  </div>
-                  <CardContent className="p-4">
-                    <h3 className="font-medium text-lg line-clamp-1">
-                      {product.title}
-                    </h3>
-                    <p className="text-muted-foreground text-sm mt-1 line-clamp-2">
-                      {product.description}
-                    </p>
-                    <div className="mt-2 font-semibold">
-                      ${product.price.toFixed(2)}
-                    </div>
-                  </CardContent>
-                  <CardFooter className="p-4 pt-0">
-                    <Button variant="secondary" className="w-full">
-                      View Details
-                    </Button>
-                  </CardFooter>
-                </Card>
-              </Link>
-            ))}
+          <div className="flex flex-wrap gap-4 mb-8">
+            <input
+              type="text"
+              placeholder="Search products..."
+              value={search}
+              onChange={handleSearchChange}
+              className="border p-2 rounded"
+            />
+            <input
+              type="number"
+              placeholder="Min Price"
+              value={minPrice || ""}
+              onChange={(e) => handlePriceChange(e, "min")}
+              className="border p-2 rounded"
+            />
+            <input
+              type="number"
+              placeholder="Max Price"
+              value={maxPrice || ""}
+              onChange={(e) => handlePriceChange(e, "max")}
+              className="border p-2 rounded"
+            />
+            <select
+              value={sortBy}
+              onChange={handleSortChange}
+              className="border p-2 rounded"
+            >
+              <option value="price">Price</option>
+              <option value="title">Title</option>
+            </select>
+            <select
+              value={order}
+              onChange={handleOrderChange}
+              className="border p-2 rounded"
+            >
+              <option value="asc">Ascending</option>
+              <option value="desc">Descending</option>
+            </select>
+          </div>
+
+          {/* Products */}
+          {loading ? (
+            <p className="text-center">Loading...</p>
+          ) : error ? (
+            <p className="text-center text-red-500">{error}</p>
+          ) : (
+            <ProductShowcase products={products} /> // Use ProductShowcase here
+          )}
+
+          {/* Pagination */}
+          <div className="flex justify-center items-center gap-4 mt-8">
+            <Button
+              variant="outline"
+              onClick={handlePreviousPage}
+              disabled={page === 1}
+            >
+              Previous
+            </Button>
+            <span>
+              Page {page} of {totalPages}
+            </span>
+            <Button
+              variant="outline"
+              onClick={handleNextPage}
+              disabled={page === totalPages}
+            >
+              Next
+            </Button>
           </div>
         </section>
       </main>

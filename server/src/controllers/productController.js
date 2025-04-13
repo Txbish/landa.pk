@@ -77,7 +77,6 @@ const deleteProduct = asyncHandler(async (req, res) => {
 });
 
 module.exports = {
-  getAllProducts,
   getProducts,
   createProduct,
   updateProduct,

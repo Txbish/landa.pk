@@ -15,6 +15,10 @@ interface ProductShowcaseProps {
 export default function ProductShowcase({ products }: ProductShowcaseProps) {
   const [hoveredProduct, setHoveredProduct] = useState<string | null>(null);
 
+  if (products.length === 0) {
+    return <p className="text-center text-gray-500">No products found.</p>;
+  }
+
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
       {products.map((product) => (
@@ -53,17 +57,9 @@ export default function ProductShowcase({ products }: ProductShowcaseProps) {
               </div>
             </CardContent>
             <CardFooter className="p-4 pt-0">
-              <div
-                className={`w-full transition-all duration-300 ${
-                  hoveredProduct === product._id
-                    ? "opacity-100 translate-y-0"
-                    : "opacity-0 translate-y-4"
-                }`}
-              >
-                <Button variant="secondary" className="w-full">
-                  Shop Now
-                </Button>
-              </div>
+              <Button variant="secondary" className="w-full">
+                View Details
+              </Button>
             </CardFooter>
           </Card>
         </Link>

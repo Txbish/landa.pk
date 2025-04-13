@@ -4,7 +4,7 @@ import ProductShowcase from "@/components/product-showcase";
 import Footer from "@/components/footer";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { fetchProducts } from "@/app/services/productService"; // Import the fetchProducts function
+import { fetchLandingPageProducts } from "@/app/services/productService";
 import { use, useEffect, useState } from "react";
 import { Product } from "@/lib/types";
 
@@ -17,7 +17,7 @@ export default function Home() {
     async function loadProducts() {
       try {
         setLoading(true);
-        const data = await fetchProducts({ limit: 5 }); // Fetch only 5 products
+        const data = await fetchLandingPageProducts({ limit: 5 });
         setProducts(data);
       } catch (err: any) {
         setError(err.response?.data?.message || "Failed to fetch products");
