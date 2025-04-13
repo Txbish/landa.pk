@@ -52,12 +52,19 @@ const loginUser = asyncHandler(async (req, res) => {
     process.env.JWT_SECRET,
     { expiresIn: "1h" }
   );
+
+  res.cookie("token", token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+    maxAge: 3600000, // 1 hour
+  });
+
   res.status(200).json({
     _id: user._id,
     name: user.name,
     email: user.email,
     role: user.role,
-    token,
   });
 });
 const getUserProfile = asyncHandler(async (req, res) => {
