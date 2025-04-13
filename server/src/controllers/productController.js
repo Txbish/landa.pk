@@ -9,7 +9,7 @@ const getProducts = asyncHandler(async (req, res) => {
   if (category) query.category = category;
   if (minPrice) query.price = { ...query.price, $gte: Number(minPrice) };
   if (maxPrice) query.price = { ...query.price, $lte: Number(maxPrice) };
-  if (search) query.title = { $regex: search, $options: "i" }; // Case-insensitive search
+  if (search) query.title = { $regex: search, $options: "i" };
 
   const sort = {};
   if (sortBy) sort[sortBy] = order === "desc" ? -1 : 1;
@@ -22,8 +22,11 @@ const getProducts = asyncHandler(async (req, res) => {
     productsQuery = productsQuery.limit(Number(limit));
   }
 
+  const products = await productsQuery;
+
   res.status(200).json(products);
 });
+
 const createProduct = asyncHandler(async (req, res) => {
   const { title, description, price, category, image, quantity, isAvailable } =
     req.body;
