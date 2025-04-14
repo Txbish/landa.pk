@@ -43,7 +43,9 @@ jest.config.js
 logs/
 *.log.*
 
+# Ignore all .env files
 .env
+**/.env
 
 # Debug files
 npm-debug.log*
@@ -54,4 +56,3 @@ pnpm-debug.log*
 # TypeScript
 *.tsbuildinfo
 next-env.d.ts
-landa.pk/.env
