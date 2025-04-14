@@ -20,8 +20,17 @@ const app = express();
 app.use(express.json());
 app.use(
   cors({
-    origin: ["http://localhost:3000", "https://landa-pk.vercel.app/"],
-    credentials: true,
+    origin: (origin, callback) => {
+      if (
+        origin === "http://localhost:3000" ||
+        origin === "https://landa-pk.vercel.app"
+      ) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"), false);
+      }
+    },
+    credentials: true, // Enable cookies to be sent along with the request
   })
 );
 
