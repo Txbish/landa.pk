@@ -1,3 +1,4 @@
+"use client";
 import Link from "next/link";
 import Footer from "@/components/footer";
 import { Button } from "@/components/ui/button";
@@ -19,7 +20,7 @@ export default function ProductsPage() {
   const [minPrice, setMinPrice] = useState<number | null>(null);
   const [maxPrice, setMaxPrice] = useState<number | null>(null);
   const [page, setPage] = useState<number>(1);
-  const [limit] = useState<number>(10); // Fixed limit per page
+  const [limit] = useState<number>(10);
   const [totalPages, setTotalPages] = useState<number>(0);
 
   // Fetch products whenever filters or pagination state changes

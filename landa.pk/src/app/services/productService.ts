@@ -2,12 +2,13 @@ import axios from "@/lib/axios";
 import { Product } from "@/lib/types";
 import { PaginatedProductsResponse } from "@/lib/types";
 interface FetchProductsParams {
-  category?: string;
-  minPrice?: number;
-  maxPrice?: number;
+  category?: string|null;
+  minPrice?: number|null;
+  maxPrice?: number|null;
   sortBy?: string;
   order?: "asc" | "desc";
   search?: string;
+  page?:number;
   limit?: number;
 }
 
