@@ -2,7 +2,7 @@ const asyncHandler = require("express-async-handler");
 const Product = require("../models/Product");
 
 const getProducts = asyncHandler(async (req, res) => {
-  const { category, minPrice, maxPrice, sortBy, order, search, limit } =
+  const { category, minPrice, maxPrice, sortBy, order, search, limit, page } =
     req.query;
 
   const query = {};
@@ -18,13 +18,24 @@ const getProducts = asyncHandler(async (req, res) => {
     .sort(sort)
     .populate("seller", "name email");
 
-  if (limit) {
-    productsQuery = productsQuery.limit(Number(limit));
-  }
+  const currentPage = parseInt(page) || 1;
+  const itemsPerPage = parseInt(limit) || 10;
+
+  productsQuery = productsQuery
+    .skip((currentPage - 1) * itemsPerPage)
+    .limit(itemsPerPage);
+
+  const totalProducts = await Product.countDocuments(query);
+  const totalPages = Math.ceil(totalProducts / itemsPerPage);
 
   const products = await productsQuery;
 
-  res.status(200).json(products);
+  res.status(200).json({
+    products,
+    currentPage,
+    totalPages,
+    totalProducts,
+  });
 });
 
 const createProduct = asyncHandler(async (req, res) => {
