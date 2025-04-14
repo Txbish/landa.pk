@@ -5,7 +5,7 @@ import Footer from "@/components/footer";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { fetchLandingPageProducts } from "@/app/services/productService";
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Product } from "@/lib/types";
 
 export default function Home() {
