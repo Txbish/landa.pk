@@ -20,10 +20,11 @@ const app = express();
 app.use(express.json());
 app.use(
   cors({
-    origin: "http://localhost:3000", // Replace with your frontend's URL
-    credentials: true, // Allow cookies and credentials
+    origin: ["http://localhost:3000", "https://landa-pk.vercel.app/"],
+    credentials: true,
   })
 );
+
 app.use(cookieParser());
 
 app.use(
