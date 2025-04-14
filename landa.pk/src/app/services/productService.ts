@@ -12,7 +12,7 @@ interface FetchProductsParams {
   limit?: number;
 }
 
-export async function fetchLandingPageProducts(params?: FetchProductsParams): Promise<Product[]> {
+export async function fetchLandingPageProducts(params?: FetchProductsParams): Promise<PaginatedProductsResponse> {
   const response = await axios.get("/products", { params });
   return response.data;
 }

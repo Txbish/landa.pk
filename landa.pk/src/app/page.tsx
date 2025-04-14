@@ -18,7 +18,7 @@ export default function Home() {
       try {
         setLoading(true);
         const data = await fetchLandingPageProducts({ limit: 5 });
-        setProducts(data);
+        setProducts(data.products);
       } catch (err: any) {
         setError(err.response?.data?.message || "Failed to fetch products");
       } finally {
