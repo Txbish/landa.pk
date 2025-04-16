@@ -32,7 +32,9 @@ function DashboardSidebar() {
   };
 
   return (
-    <Sidebar>
+    <Sidebar className="w-64">
+      {" "}
+      {/* Adjusted width for the sidebar */}
       <SidebarHeader className="border-b p-4">
         <div className="flex items-center gap-2">
           <Avatar className="h-10 w-10">
@@ -128,7 +130,11 @@ export default function DashboardLayout({
         <DashboardSidebar />
         <div className="flex flex-1 flex-col">
           <DashboardNavbar />
-          <main className="flex-1 p-6">{children}</main>
+          <main className="flex-1 p-6 max-w-7xl mx-auto">
+            {" "}
+            {/* Adjusted content width */}
+            {children}
+          </main>
         </div>
       </div>
     </SidebarProvider>
