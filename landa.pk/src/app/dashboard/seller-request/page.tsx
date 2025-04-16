@@ -1,9 +1,7 @@
 "use client";
 
-import type React from "react";
-
 import { useState, useEffect } from "react";
-import { useAuth } from "@/contexts/auth-context";
+import { useAuth } from "@/context/AuthContext";
 import {
   Card,
   CardContent,
@@ -19,9 +17,17 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Store } from "lucide-react";
+import {
+  fetchUserSellerRequest,
+  submitSellerRequest,
+} from "@/services/sellerRequestService";
+import { SellerRequest } from "@/lib/types";
 
 export default function SellerRequestPage() {
-  const { user, isLoading, sellerRequest, submitSellerRequest } = useAuth();
+  const { user, loading } = useAuth();
+  const [sellerRequest, setSellerRequest] = useState<SellerRequest | null>(
+    null
+  );
   const [formData, setFormData] = useState({
     businessName: "",
     reason: "",
@@ -37,24 +43,16 @@ export default function SellerRequestPage() {
   useEffect(() => {
     const fetchSellerRequest = async () => {
       try {
-        // In a real app, you would fetch from your API
-        // const response = await fetch('/api/seller-requests/me')
-        // const data = await response.json()
-        // if (data.sellerRequest) {
-        //   setSellerRequest(data.sellerRequest)
-        // }
-
-        // For demo purposes, we'll simulate a delay
-        setTimeout(() => {
-          setFetchingRequest(false);
-        }, 1000);
+        const data = await fetchUserSellerRequest();
+        setSellerRequest(data);
       } catch (error) {
         console.error("Failed to fetch seller request:", error);
+      } finally {
         setFetchingRequest(false);
       }
     };
 
-    if (user && user.role === "user") {
+    if (user) {
       fetchSellerRequest();
     } else {
       setFetchingRequest(false);
@@ -66,7 +64,6 @@ export default function SellerRequestPage() {
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-    // Clear error when user types
     if (errors[name as keyof typeof errors]) {
       setErrors((prev) => ({ ...prev, [name]: "" }));
     }
@@ -102,7 +99,11 @@ export default function SellerRequestPage() {
     setIsSubmitting(true);
 
     try {
-      await submitSellerRequest(formData.businessName, formData.reason);
+      const newRequest = await submitSellerRequest(
+        formData.businessName,
+        formData.reason
+      );
+      setSellerRequest(newRequest);
       showToast(
         "Your seller request has been submitted successfully",
         "success",
@@ -120,7 +121,7 @@ export default function SellerRequestPage() {
     }
   };
 
-  if (isLoading || fetchingRequest) {
+  if (loading || fetchingRequest) {
     return (
       <div className="flex h-full items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -128,7 +129,6 @@ export default function SellerRequestPage() {
     );
   }
 
-  // If user is already a seller
   if (user?.role === "seller") {
     return (
       <div className="mx-auto max-w-3xl space-y-6">
@@ -148,7 +148,6 @@ export default function SellerRequestPage() {
     );
   }
 
-  // If user has a pending seller request
   if (sellerRequest) {
     return (
       <div className="mx-auto max-w-3xl space-y-6">
@@ -174,7 +173,6 @@ export default function SellerRequestPage() {
                 {sellerRequest.status}
               </Badge>
             </div>
-
             <div className="space-y-4">
               <div>
                 <h3 className="text-sm font-medium text-muted-foreground">
@@ -182,26 +180,25 @@ export default function SellerRequestPage() {
                 </h3>
                 <p className="text-base">{sellerRequest.businessName}</p>
               </div>
-
               <div>
                 <h3 className="text-sm font-medium text-muted-foreground">
                   Reason for Application
                 </h3>
                 <p className="text-base">{sellerRequest.reason}</p>
               </div>
-
               <div>
                 <h3 className="text-sm font-medium text-muted-foreground">
                   Submitted On
                 </h3>
                 <p className="text-base">
-                  {new Date(
-                    sellerRequest.createdAt || Date.now()
-                  ).toLocaleDateString("en-US", {
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                  })}
+                  {new Date(sellerRequest.createdAt).toLocaleDateString(
+                    "en-US",
+                    {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    }
+                  )}
                 </p>
               </div>
             </div>
@@ -234,11 +231,9 @@ export default function SellerRequestPage() {
     );
   }
 
-  // Default view - user can submit a seller request
   return (
     <div className="mx-auto max-w-3xl space-y-6">
       <h1 className="text-2xl font-bold">Become a Seller</h1>
-
       <Card>
         <CardHeader>
           <CardTitle>Seller Application</CardTitle>
@@ -264,7 +259,6 @@ export default function SellerRequestPage() {
                 </p>
               )}
             </div>
-
             <div className="space-y-2">
               <Label htmlFor="reason">
                 Why do you want to become a seller on our platform?

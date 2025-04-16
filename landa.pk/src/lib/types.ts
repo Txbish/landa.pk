@@ -49,9 +49,12 @@ export interface Order {
 }
 
 // Seller request type
+// Seller request type
 export interface SellerRequest {
-  _id: string;
+  _id: string; // Unique identifier for the seller request
   user: User; // Reference to the User type
+  businessName: string; // Name of the business
+  reason: string; // Reason for the seller request
   status: "Pending" | "Approved" | "Rejected"; // Status of the seller request
   createdAt: string; // Timestamp for when the request was created
   updatedAt: string; // Timestamp for when the request was last updated

@@ -2,13 +2,21 @@ const SellerRequest = require("../models/SellerRequest");
 const asyncHandler = require("express-async-handler");
 
 const getSellerRequests = asyncHandler(async (req, res) => {
-  const sellerRequests = await SellerRequest.find({}).populate(
-    "user",
-    "name email"
-  );
+  const sellerRequests = await SellerRequest.find({});
   res.status(200).json(sellerRequests);
 });
+const getUserSellerRequest = asyncHandler(async (req, res) => {
+  const sellerRequest = await SellerRequest.findOne({
+    user: req.user._id,
+  });
 
+  if (!sellerRequest) {
+    res.status(404);
+    throw new Error("Seller request not found for this user");
+  }
+
+  res.status(200).json(sellerRequest);
+});
 const createSellerRequest = asyncHandler(async (req, res) => {
   const { businessName } = req.body;
 
@@ -42,6 +50,7 @@ const handleSellerRequest = asyncHandler(async (req, res) => {
 });
 
 module.exports = {
+  getUserSellerRequest,
   getSellerRequests,
   createSellerRequest,
   handleSellerRequest,
