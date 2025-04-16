@@ -104,7 +104,7 @@ const getUserProfile = asyncHandler(async (req, res) => {
 });
 
 const updateUserProfile = asyncHandler(async (req, res) => {
-  const { name, email } = req.body;
+  const { name, phone, address } = req.body;
 
   const user = await User.findById(req.user.id);
 
@@ -114,13 +114,20 @@ const updateUserProfile = asyncHandler(async (req, res) => {
   }
 
   user.name = name || user.name;
-  user.email = email || user.email;
+  user.phone = phone || user.phone;
+  user.address = address || user.address;
 
   await user.save();
+
   res.json({
     message: "Profile updated successfully",
-    name: user.name,
-    email: user.email,
+    user: {
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      phone: user.phone,
+      address: user.address,
+    },
   });
 });
 
