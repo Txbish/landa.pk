@@ -9,7 +9,12 @@ logoutUser = asyncHandler(async (req, res) => {
 });
 
 const registerUser = asyncHandler(async (req, res) => {
-  const { name, email, password } = req.body;
+  const { name, email, password, address, phone } = req.body;
+
+  if (!name || !email || !password || !address || !phone) {
+    res.status(400);
+    throw new Error("Please fill in all required fields");
+  }
 
   const userExists = await User.findOne({ email });
 
@@ -24,15 +29,20 @@ const registerUser = asyncHandler(async (req, res) => {
     name,
     email,
     password: hashedPassword,
+    address,
+    phone,
+    role,
   });
 
   if (user) {
     res.status(201).json({
       messaege: "User registered successfully",
       user: {
-        _id: user._id,
+        _id: user.id,
         name: user.name,
         email: user.email,
+        address: user.address,
+        phone: user.phone,
         role: user.role,
       },
     });

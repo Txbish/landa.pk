@@ -122,6 +122,7 @@ export default function SignupPage() {
 
     try {
       // Create FormData for file upload
+
       const data = new FormData();
       data.append("name", formData.name);
       data.append("email", formData.email);
@@ -133,7 +134,9 @@ export default function SignupPage() {
       if (formData.profileImage) {
         data.append("profileImage", formData.profileImage);
       }
-
+      for (const [key, value] of data.entries()) {
+        console.log(`${key}:`, value);
+      }
       const response = await axios.post("/users/register", data);
 
       console.log("Signup successful:", response.data);
