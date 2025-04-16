@@ -31,6 +31,7 @@ interface AuthContextType {
     currentPassword: string,
     newPassword: string
   ) => Promise<void>;
+  fetchUser: () => Promise<void>; // Add fetchUser to the context type
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -39,29 +40,37 @@ interface AuthProviderProps {
   children: React.ReactNode;
 }
 
+export async function fetchUser(): Promise<User | null> {
+  try {
+    const response = await axios.get("/users/profile");
+    return response.data.user;
+  } catch (error) {
+    console.error("Error fetching user:", error);
+    return null;
+  }
+}
+
 export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loading, setLoading] = useState(true);
 
+  const fetchUserAndSetState = useCallback(async () => {
+    const fetchedUser = await fetchUser();
+    if (fetchedUser) {
+      setUser(fetchedUser);
+      setIsLoggedIn(true);
+    } else {
+      setUser(null);
+      setIsLoggedIn(false);
+    }
+    setLoading(false);
+  }, []); // Empty dependency array to ensure this function is stable
+
   useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const response = await axios.get("/users/profile");
-        setUser(response.data.user);
-        setIsLoggedIn(true);
-      } catch {
-        setUser(null);
-        setIsLoggedIn(false);
-      } finally {
-        setLoading(false);
-      }
-    };
+    fetchUserAndSetState();
+  }, [fetchUserAndSetState]); // Only run once on mount
 
-    fetchUser();
-  }, []);
-
-  // Login function
   const login = useCallback(async (email: string, password: string) => {
     const response = await axios.post("/users/login", { email, password });
     console.log(response.data);
@@ -110,7 +119,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
     []
   );
 
-  // Context value memoized
   const value = useMemo<AuthContextType>(
     () => ({
       user,
@@ -120,6 +128,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       logout,
       updateProfile,
       updatePassword,
+      fetchUser: fetchUserAndSetState,
     }),
     [user, isLoggedIn, loading, login, logout, updateProfile, updatePassword]
   );
