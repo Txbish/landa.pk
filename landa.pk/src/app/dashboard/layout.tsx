@@ -130,7 +130,7 @@ export default function DashboardLayout({
         <DashboardSidebar />
         <div className="flex flex-1 flex-col">
           <DashboardNavbar />
-          <main className="flex-1 p-6 max-w-7xl mx-auto">
+          <main className="flex-1 p-6 mx-auto">
             {" "}
             {/* Adjusted content width */}
             {children}
