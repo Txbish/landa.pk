@@ -80,13 +80,13 @@ const getUserProfile = asyncHandler(async (req, res) => {
   }
 
   res.json({
-    _id: user._id,
-    name: user.name,
-    email: user.email,
-    role: user.role,
-    profileImage: user.profileImage,
-    phone: user.phone,
-    address: user.address,
+    _id: req.user._id,
+    name: req.user.name,
+    email: req.user.email,
+    role: req.user.role,
+    profileImage: req.user.profileImage,
+    phone: req.user.phone,
+    address: req.user.address,
   });
 });
 
