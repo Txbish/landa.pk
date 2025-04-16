@@ -83,9 +83,9 @@ const loginUser = asyncHandler(async (req, res) => {
     name: user.name,
     email: user.email,
     role: user.role,
-    profileImage: user.profileImage,
     address: user.address || "",
     phone: user.phone || "",
+    profileImage: user.profileImage,
   });
 });
 const getUserProfile = asyncHandler(async (req, res) => {

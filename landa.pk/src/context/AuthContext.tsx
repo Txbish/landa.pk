@@ -47,9 +47,22 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const fetchUser = async () => {
     try {
       const response = await axios.get("/users/profile");
-      setUser(response.data.user);
+
+      console.log("Fetch user response:", response.data);
+
+      setUser({
+        _id: response.data._id,
+        name: response.data.name,
+        email: response.data.email,
+        role: response.data.role,
+        address: response.data.address || "",
+        phone: response.data.phone || "",
+        profileImage: response.data.profileImage || "",
+      });
+
       setIsLoggedIn(true);
-    } catch {
+    } catch (error) {
+      console.error("Failed to fetch user:", error);
       setUser(null);
       setIsLoggedIn(false);
     } finally {
@@ -62,10 +75,26 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }, []);
 
   const login = useCallback(async (email: string, password: string) => {
-    const response = await axios.post("/users/login", { email, password });
-    console.log(response.data);
-    setUser(response.data.user);
-    setIsLoggedIn(true);
+    try {
+      const response = await axios.post("/users/login", { email, password });
+
+      console.log("Login response:", response.data);
+
+      setUser({
+        _id: response.data._id,
+        name: response.data.name,
+        email: response.data.email,
+        role: response.data.role,
+        address: response.data.address || "",
+        phone: response.data.phone || "",
+        profileImage: response.data.profileImage || "",
+      });
+
+      setIsLoggedIn(true);
+    } catch (error: any) {
+      console.error("Login failed:", error.response?.data || error.message);
+      throw new Error(error.response?.data?.message || "Login failed");
+    }
   }, []);
 
   const logout = useCallback(async () => {
@@ -109,7 +138,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
     []
   );
 
-  // Context value memoized
   const value = useMemo<AuthContextType>(
     () => ({
       user,
@@ -126,7 +154,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
-// Custom hook to use auth
 export function useAuth() {
   const context = useContext(AuthContext);
   if (!context) {
