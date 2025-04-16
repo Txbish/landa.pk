@@ -31,7 +31,7 @@ interface AuthContextType {
     currentPassword: string,
     newPassword: string
   ) => Promise<void>;
-  fetchUser: () => Promise<void>; // Add fetchUser to the context type
+  fetchUser: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -56,6 +56,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [loading, setLoading] = useState(true);
 
   const fetchUserAndSetState = useCallback(async () => {
+    if (user) {
+      console.log("User already set, skipping fetch");
+      return;
+    }
+
+    setLoading(true);
     const fetchedUser = await fetchUser();
     if (fetchedUser) {
       setUser(fetchedUser);
@@ -65,17 +71,27 @@ export function AuthProvider({ children }: AuthProviderProps) {
       setIsLoggedIn(false);
     }
     setLoading(false);
-  }, []); // Empty dependency array to ensure this function is stable
+  }, [user]);
 
   useEffect(() => {
     fetchUserAndSetState();
-  }, [fetchUserAndSetState]); // Only run once on mount
+  }, [fetchUserAndSetState]);
 
   const login = useCallback(async (email: string, password: string) => {
-    const response = await axios.post("/users/login", { email, password });
-    console.log(response.data);
-    setUser(response.data.user);
-    setIsLoggedIn(true);
+    try {
+      const response = await axios.post("/users/login", { email, password });
+      console.log("Login response:", response.data);
+
+      if (response.data.user) {
+        setUser(response.data.user);
+        setIsLoggedIn(true);
+      } else {
+        console.error("No user data returned from login API");
+      }
+    } catch (error: any) {
+      console.error("Login failed:", error.response?.data || error.message);
+      throw new Error(error.response?.data?.message || "Failed to log in");
+    }
   }, []);
 
   const logout = useCallback(async () => {
@@ -136,7 +152,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
-// Custom hook to use auth
 export function useAuth() {
   const context = useContext(AuthContext);
   if (!context) {
