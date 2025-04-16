@@ -6,9 +6,6 @@ const orderSchema = new mongoose.Schema(
     items: [
       {
         product: { type: mongoose.Schema.Types.ObjectId, ref: "Product" },
-        quantity: { type: Number, default: 1 },
-        seller: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-        price: Number,
         itemStatus: {
           type: String,
           enum: ["Pending", "Cancelled", "Completed"],

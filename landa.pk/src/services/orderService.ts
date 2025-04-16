@@ -4,11 +4,13 @@ export const fetchOrders = async () => {
   const response = await axiosInstance.get("/orders");
   return response.data;
 };
-
-// Fetch a specific order by ID
+export const fetchUserOrders = async () => {
+  const response = await axiosInstance.get("/orders/userOrder");
+  return response.data;
+};
 export const fetchOrderById = async (orderId: string) => {
   const response = await axiosInstance.get(`/orders/${orderId}`);
-  return response.data; // Returns the order details
+  return response.data; 
 };
 
 // Create a new order

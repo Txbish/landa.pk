@@ -8,7 +8,6 @@ const productSchema = new mongoose.Schema(
     category: String,
     image: { type: String, required: true },
     seller: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-    quantity: { type: Number, default: 1, min: 1 },
     isAvailable: { type: Boolean, default: true },
   },
   { timestamps: true }

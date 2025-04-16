@@ -1,7 +1,8 @@
 const express = require("express");
 const router = express.Router();
-const { authenticate } = require("../middleware/auth");
+const { authenticate, isAdmin } = require("../middleware/auth");
 const {
+  getUserOrders,
   getAllOrders,
   getOrderById,
   createOrder,
@@ -10,12 +11,14 @@ const {
 
 router
   .route("/")
-  .get(authenticate, getAllOrders)
+  .get(authenticate, isAdmin, getAllOrders)
   .post(authenticate, createOrder);
 
 router
   .route("/:id")
   .get(authenticate, getOrderById)
   .put(authenticate, updateOrderStatus);
+
+router.get("/userOrder", authenticate, getUserOrders);
 
 module.exports = router;

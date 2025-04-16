@@ -1,6 +1,14 @@
 const asyncHandler = require("express-async-handler");
 const Order = require("../models/Order");
 
+const getUserOrders = asyncHandler(async (req, res) => {
+  const userId = req.user._id; // Extract user ID from the authenticated request
+
+  const orders = await Order.find({ user: userId }).populate("items.product");
+
+  res.status(200).json({ orders });
+});
+
 const getAllOrders = asyncHandler(async (req, res) => {
   const orders = await Order.find({})
     .populate("user", "name email")
@@ -83,6 +91,7 @@ const updateItemStatus = asyncHandler(async (req, res) => {
 });
 
 module.exports = {
+  getUserOrders,
   getAllOrders,
   getOrderById,
   createOrder,

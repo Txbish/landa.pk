@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useAuth } from "@/contexts/auth-context";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   Table,
@@ -30,160 +29,53 @@ import {
 } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, ShoppingCart } from "lucide-react";
-
-// Types based on the provided models
-type Product = {
-  _id: string;
-  title: string;
-  description: string;
-  price: number;
-  category: string;
-  image: string;
-  seller: string;
-  quantity: number;
-  isAvailable: boolean;
-};
-
-type OrderItem = {
-  _id: string;
-  product: Product;
-  quantity: number;
-  seller: string;
-  price: number;
-  itemStatus: "Pending" | "Cancelled" | "Completed";
-};
-
-type Order = {
-  _id: string;
-  user: string;
-  items: OrderItem[];
-  totalAmount: number;
-  overallStatus: "Pending" | "Cancelled" | "Completed";
-  createdAt: string;
-};
-
-// Mock orders data for demonstration
-const mockOrders: Order[] = [
-  {
-    _id: "order1",
-    user: "user123",
-    items: [
-      {
-        _id: "item1",
-        product: {
-          _id: "prod1",
-          title: "Smartphone",
-          description: "Latest model smartphone with advanced features",
-          price: 799.99,
-          category: "Electronics",
-          image: "/placeholder.svg?height=100&width=100",
-          seller: "seller1",
-          quantity: 10,
-          isAvailable: true,
-        },
-        quantity: 1,
-        seller: "seller1",
-        price: 799.99,
-        itemStatus: "Pending",
-      },
-      {
-        _id: "item2",
-        product: {
-          _id: "prod2",
-          title: "Wireless Earbuds",
-          description: "High-quality wireless earbuds with noise cancellation",
-          price: 149.99,
-          category: "Electronics",
-          image: "/placeholder.svg?height=100&width=100",
-          seller: "seller2",
-          quantity: 20,
-          isAvailable: true,
-        },
-        quantity: 1,
-        seller: "seller2",
-        price: 149.99,
-        itemStatus: "Pending",
-      },
-    ],
-    totalAmount: 949.98,
-    overallStatus: "Pending",
-    createdAt: "2023-05-15T10:30:00Z",
-  },
-  {
-    _id: "order2",
-    user: "user123",
-    items: [
-      {
-        _id: "item3",
-        product: {
-          _id: "prod3",
-          title: "Laptop",
-          description: "Powerful laptop for work and gaming",
-          price: 1299.99,
-          category: "Electronics",
-          image: "/placeholder.svg?height=100&width=100",
-          seller: "seller1",
-          quantity: 5,
-          isAvailable: true,
-        },
-        quantity: 1,
-        seller: "seller1",
-        price: 1299.99,
-        itemStatus: "Completed",
-      },
-    ],
-    totalAmount: 1299.99,
-    overallStatus: "Completed",
-    createdAt: "2023-04-20T14:45:00Z",
-  },
-];
+import { useAuth } from "@/context/AuthContext";
+import {
+  fetchUserOrders,
+  updateOrderStatus,
+  updateItemStatus,
+} from "@/services/orderService";
+import { Order, OrderItem } from "@/lib/types"; // Import types from types.ts
 
 export default function MyOrdersPage() {
-  const { user, isLoading } = useAuth();
+  const { user, loading } = useAuth();
   const [orders, setOrders] = useState<Order[]>([]);
   const [isLoadingOrders, setIsLoadingOrders] = useState(true);
   const [cancelItemId, setCancelItemId] = useState<string | null>(null);
   const [cancelOrderId, setCancelOrderId] = useState<string | null>(null);
   const [isCancelling, setIsCancelling] = useState(false);
   const { showToast } = useToast();
-  useEffect(() => {
-    const fetchOrders = async () => {
-      try {
-        // In a real app, you would fetch from your API
-        // const response = await fetch('/api/orders')
-        // const data = await response.json()
-        // setOrders(data.orders)
 
-        // For demo purposes, we'll use mock data
-        setTimeout(() => {
-          setOrders(mockOrders);
-          setIsLoadingOrders(false);
-        }, 1000);
+  useEffect(() => {
+    const loadOrders = async () => {
+      try {
+        setIsLoadingOrders(true);
+        const data = await fetchUserOrders();
+        setOrders(data.orders);
       } catch (error) {
         console.error("Failed to fetch orders:", error);
+        showToast(
+          "Failed to fetch orders. Please try again.",
+          "error",
+          "Error"
+        );
+      } finally {
         setIsLoadingOrders(false);
       }
     };
 
     if (user) {
-      fetchOrders();
+      loadOrders();
     }
-  }, [user]);
+  }, [user, showToast]);
 
   const handleCancelItem = async () => {
+    if (!cancelOrderId) return;
     if (!cancelItemId) return;
 
     setIsCancelling(true);
     try {
-      // In a real app, you would call your API
-      // await fetch(`/api/orders/items/${cancelItemId}/cancel`, {
-      //   method: 'POST',
-      // })
-
-      // For demo purposes
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      // Update the local state
+      await updateItemStatus(cancelOrderId, cancelItemId, "Cancelled"); // Update item status
       setOrders((prevOrders) =>
         prevOrders.map((order) => ({
           ...order,
@@ -194,7 +86,6 @@ export default function MyOrdersPage() {
           ),
         }))
       );
-
       showToast(
         "The item has been cancelled successfully.",
         "success",
@@ -218,15 +109,7 @@ export default function MyOrdersPage() {
 
     setIsCancelling(true);
     try {
-      // In a real app, you would call your API
-      // await fetch(`/api/orders/${cancelOrderId}/cancel`, {
-      //   method: 'POST',
-      // })
-
-      // For demo purposes
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      // Update the local state
+      await updateOrderStatus(cancelOrderId, "Cancelled"); // Update order status
       setOrders((prevOrders) =>
         prevOrders.map((order) =>
           order._id === cancelOrderId
@@ -241,7 +124,6 @@ export default function MyOrdersPage() {
             : order
         )
       );
-
       showToast(
         "The order has been cancelled successfully.",
         "success",
@@ -291,7 +173,7 @@ export default function MyOrdersPage() {
     });
   };
 
-  if (isLoading || isLoadingOrders) {
+  if (loading || isLoadingOrders) {
     return (
       <div className="flex h-full items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -352,7 +234,6 @@ export default function MyOrdersPage() {
                     <TableRow>
                       <TableHead>Product</TableHead>
                       <TableHead>Price</TableHead>
-                      <TableHead>Quantity</TableHead>
                       <TableHead>Status</TableHead>
                       <TableHead>Actions</TableHead>
                     </TableRow>
@@ -375,8 +256,7 @@ export default function MyOrdersPage() {
                             </p>
                           </div>
                         </TableCell>
-                        <TableCell>${item.price.toFixed(2)}</TableCell>
-                        <TableCell>{item.quantity}</TableCell>
+                        <TableCell>${item.product.price.toFixed(2)}</TableCell>
                         <TableCell>{getStatusBadge(item.itemStatus)}</TableCell>
                         <TableCell>
                           {item.itemStatus === "Pending" && (
