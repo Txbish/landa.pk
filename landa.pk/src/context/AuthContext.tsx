@@ -31,7 +31,6 @@ interface AuthContextType {
     currentPassword: string,
     newPassword: string
   ) => Promise<void>;
-  fetchUser: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -40,58 +39,33 @@ interface AuthProviderProps {
   children: React.ReactNode;
 }
 
-export async function fetchUser(): Promise<User | null> {
-  try {
-    const response = await axios.get("/users/profile");
-    return response.data.user;
-  } catch (error) {
-    console.error("Error fetching user:", error);
-    return null;
-  }
-}
-
 export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  const fetchUserAndSetState = useCallback(async () => {
-    if (user) {
-      console.log("User already set, skipping fetch");
-      return;
-    }
-
-    setLoading(true);
-    const fetchedUser = await fetchUser();
-    if (fetchedUser) {
-      setUser(fetchedUser);
+  const fetchUser = async () => {
+    try {
+      const response = await axios.get("/users/profile");
+      setUser(response.data.user);
       setIsLoggedIn(true);
-    } else {
+    } catch {
       setUser(null);
       setIsLoggedIn(false);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
-  }, [user]);
+  };
 
   useEffect(() => {
-    fetchUserAndSetState();
-  }, [fetchUserAndSetState]);
+    fetchUser();
+  }, []);
 
   const login = useCallback(async (email: string, password: string) => {
-    try {
-      const response = await axios.post("/users/login", { email, password });
-      console.log("Login response:", response.data);
-
-      if (response.data.user) {
-        setUser(response.data.user);
-        setIsLoggedIn(true);
-      } else {
-        console.error("No user data returned from login API");
-      }
-    } catch (error: any) {
-      console.error("Login failed:", error.response?.data || error.message);
-      throw new Error(error.response?.data?.message || "Failed to log in");
-    }
+    const response = await axios.post("/users/login", { email, password });
+    console.log(response.data);
+    setUser(response.data.user);
+    setIsLoggedIn(true);
   }, []);
 
   const logout = useCallback(async () => {
@@ -135,6 +109,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     []
   );
 
+  // Context value memoized
   const value = useMemo<AuthContextType>(
     () => ({
       user,
@@ -144,7 +119,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
       logout,
       updateProfile,
       updatePassword,
-      fetchUser: fetchUserAndSetState,
     }),
     [user, isLoggedIn, loading, login, logout, updateProfile, updatePassword]
   );
@@ -152,6 +126,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
+// Custom hook to use auth
 export function useAuth() {
   const context = useContext(AuthContext);
   if (!context) {
