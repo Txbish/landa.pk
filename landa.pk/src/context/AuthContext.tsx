@@ -30,7 +30,7 @@ interface AuthContextType {
 // Create the context
 const AuthContext = createContext<AuthContextType | null>(null);
 
-// Props for the provider
+// Props for the provide
 interface AuthProviderProps {
   children: React.ReactNode;
 }
