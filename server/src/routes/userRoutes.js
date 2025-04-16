@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const {
+  logoutUser,
   getUserProfile,
   updateUserProfile,
   updatePassword,
@@ -16,6 +17,8 @@ router.route("/profile").put(authenticate, updateUserProfile);
 router.route("/profile/password").put(authenticate, updatePassword);
 
 router.route("/login").post(loginUser);
+
+router.post("/logout", authenticate, logoutUser);
 
 router.route("/register").post(registerUser);
 module.exports = router;

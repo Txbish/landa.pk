@@ -3,6 +3,11 @@ const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
+logoutUser = asyncHandler(async (req, res) => {
+  res.clearCookie("token");
+  res.status(200).json({ message: "Logged out successfully" });
+});
+
 const registerUser = asyncHandler(async (req, res) => {
   const { name, email, password } = req.body;
 
@@ -57,7 +62,7 @@ const loginUser = asyncHandler(async (req, res) => {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "strict",
-    maxAge: 3600000, // 1 hour
+    maxAge: 3600000,
   });
 
   res.status(200).json({
@@ -65,17 +70,17 @@ const loginUser = asyncHandler(async (req, res) => {
     name: user.name,
     email: user.email,
     role: user.role,
+    profileImage: user.profileImage,
   });
 });
 const getUserProfile = asyncHandler(async (req, res) => {
-  const user = await User.findById(req.user.id);
-
-  if (!user) {
-    res.status(404).json({ message: "User not found" });
-    return;
+  if (!req.user) {
+    res.status(401);
+    throw new Error("Not authenticated");
   }
 
   res.json({
+    _id: user._id,
     name: user.name,
     email: user.email,
     role: user.role,
@@ -130,6 +135,7 @@ const updatePassword = asyncHandler(async (req, res) => {
 });
 
 module.exports = {
+  logoutUser,
   getUserProfile,
   updateUserProfile,
   updatePassword,

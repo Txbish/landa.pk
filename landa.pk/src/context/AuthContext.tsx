@@ -10,32 +10,35 @@ import React, {
 } from "react";
 import axios from "@/lib/axios";
 
-// Define user interface
 interface User {
   _id: string;
   name: string;
   email: string;
   role: string;
+  address?: string;
+  phone?: string;
+  profileImage?: string;
 }
 
-// Define AuthContext shape
 interface AuthContextType {
   user: User | null;
   isLoggedIn: boolean;
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
+  updateProfile: (updatedData: Partial<User>) => Promise<void>;
+  updatePassword: (
+    currentPassword: string,
+    newPassword: string
+  ) => Promise<void>;
 }
 
-// Create the context
 const AuthContext = createContext<AuthContextType | null>(null);
 
-// Props for the provid
 interface AuthProviderProps {
   children: React.ReactNode;
 }
 
-// The provider itself
 export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -44,7 +47,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const response = await axios.get("/auth/me");
+        const response = await axios.get("/users/profile");
         setUser(response.data.user);
         setIsLoggedIn(true);
       } catch {
@@ -65,12 +68,46 @@ export function AuthProvider({ children }: AuthProviderProps) {
     setIsLoggedIn(true);
   }, []);
 
-  // Logout function
   const logout = useCallback(async () => {
-    await axios.post("/auth/logout");
+    await axios.post("/users/logout");
     setUser(null);
     setIsLoggedIn(false);
   }, []);
+
+  const updateProfile = useCallback(async (updatedData: Partial<User>) => {
+    try {
+      const response = await axios.put("/users/profile", updatedData);
+      setUser(response.data);
+    } catch (error: any) {
+      console.error(
+        "Failed to update profile:",
+        error.response?.data || error.message
+      );
+      throw new Error(
+        error.response?.data?.message || "Failed to update profile"
+      );
+    }
+  }, []);
+
+  const updatePassword = useCallback(
+    async (currentPassword: string, newPassword: string) => {
+      try {
+        await axios.put("/users/profile/password", {
+          currentPassword,
+          newPassword,
+        });
+      } catch (error: any) {
+        console.error(
+          "Failed to update password:",
+          error.response?.data || error.message
+        );
+        throw new Error(
+          error.response?.data?.message || "Failed to update password"
+        );
+      }
+    },
+    []
+  );
 
   // Context value memoized
   const value = useMemo<AuthContextType>(
@@ -80,8 +117,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
       loading,
       login,
       logout,
+      updateProfile,
+      updatePassword,
     }),
-    [user, isLoggedIn, loading, login, logout]
+    [user, isLoggedIn, loading, login, logout, updateProfile, updatePassword]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
