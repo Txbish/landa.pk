@@ -109,7 +109,7 @@ const Index = () => {
         <ProductsSection />
 
         {/* Newsletter Section */}
-        <div className="py-16">
+        {/* <div className="py-16">
           <div className="bg-landa-green rounded-xl p-8 text-center text-white">
             <h2 className="font-display text-3xl font-bold mb-2">
               Join Our Groovy Newsletter
@@ -129,7 +129,7 @@ const Index = () => {
               </button>
             </div>
           </div>
-        </div>
+        </div> */}
       </div>
 
       <Footer />

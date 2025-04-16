@@ -41,7 +41,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  // Fetch the user on mount
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -61,7 +60,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   // Login function
   const login = useCallback(async (email: string, password: string) => {
-    const response = await axios.post("/auth/login", { email, password });
+    const response = await axios.post("/users/login", { email, password });
     setUser(response.data.user);
     setIsLoggedIn(true);
   }, []);

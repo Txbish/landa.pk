@@ -1,3 +1,4 @@
+"use client";
 import { useState, useEffect } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -162,6 +163,24 @@ const Shop = () => {
               <option value="desc">Descending</option>
             </select>
           </div>
+
+          {/* Price Range */}
+          <div className="flex gap-2">
+            <input
+              type="number"
+              placeholder="Min Price"
+              value={minPrice || ""}
+              onChange={(e) => handlePriceChange(e, "min")}
+              className="w-full px-4 py-2 rounded-full bg-landa-green/20 border-none focus:ring-landa-green focus:outline-none"
+            />
+            <input
+              type="number"
+              placeholder="Max Price"
+              value={maxPrice || ""}
+              onChange={(e) => handlePriceChange(e, "max")}
+              className="w-full px-4 py-2 rounded-full bg-landa-green/20 border-none focus:ring-landa-green focus:outline-none"
+            />
+          </div>
         </div>
 
         {/* Category Filter */}
@@ -170,7 +189,7 @@ const Shop = () => {
             <button
               key={cat}
               onClick={() => handleCategoryChange(cat)}
-              className={`flex-shrink-0 w-20 h-20 rounded-full flex items-center justify-center text-sm font-medium whitespace-nowrap transition-colors ${
+              className={`px-4 py-2 rounded-lg whitespace-nowrap transition-colors ${
                 category === cat || (cat === "All" && !category)
                   ? "bg-landa-green text-white"
                   : "bg-gray-100 hover:bg-gray-200"
