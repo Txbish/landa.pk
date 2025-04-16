@@ -4,28 +4,29 @@ const asyncHandler = require("express-async-handler");
 
 const authenticate = asyncHandler(async (req, res, next) => {
   let token;
+  if (req.cookies && req.cookies.token) {
+    token = req.cookies.token;
+  }
 
-  // Check for token in Authorization header
-  if (
-    req.headers.authorization &&
-    req.headers.authorization.startsWith("Bearer")
-  ) {
-    try {
-      token = req.headers.authorization.split(" ")[1];
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      console.log("Decoded JWT:", decoded);
-      // Ensure we are using the correct field in the token
-      req.user = await User.findById(decoded.userId); // Should be decoded.userId, not decoded.id
-      if (!req.user) {
-        return res.status(401).json({ message: "User not found" });
-      }
+  if (!token) {
+    return res.status(401).json({ message: "Not authorized, no token" });
+  }
 
-      next();
-    } catch (err) {
-      res.status(401).json({ message: "Not authorized, token failed" });
+  try {
+    // Verify token
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    console.log("Decoded JWT:", decoded);
+
+    // Attach user to request
+    req.user = await User.findById(decoded.userId).select("-password");
+    if (!req.user) {
+      return res.status(401).json({ message: "User not found" });
     }
-  } else {
-    res.status(401).json({ message: "Not authorized, no token" });
+
+    next();
+  } catch (err) {
+    console.error("Token verification failed:", err);
+    res.status(401).json({ message: "Not authorized, token failed" });
   }
 });
 
