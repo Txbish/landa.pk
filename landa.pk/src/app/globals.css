@@ -189,3 +189,11 @@
     @apply bg-landa-green hover:bg-landa-darkgreen text-white font-bold py-3 px-6 rounded-md transition-all duration-300 inline-block;
   }
 }
+.no-scrollbar {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, and Opera */
+}
