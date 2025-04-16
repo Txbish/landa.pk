@@ -1,8 +1,7 @@
 "use client";
 
 import type React from "react";
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -30,13 +29,11 @@ import { Loader2 } from "lucide-react";
 
 export default function PersonalInfoPage() {
   const { user, updateProfile, updatePassword, loading } = useAuth();
-  const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
-    name: user?.name || "",
-    phone: user?.phone || "",
-    address: user?.address || "",
+    name: "",
+    phone: "",
+    address: "",
   });
-  const { showToast } = useToast();
   const [passwordData, setPasswordData] = useState({
     currentPassword: "",
     newPassword: "",
@@ -47,23 +44,21 @@ export default function PersonalInfoPage() {
     newPassword: "",
     confirmPassword: "",
   });
+  const [isEditing, setIsEditing] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isChangingPassword, setIsChangingPassword] = useState(false);
+  const { showToast } = useToast();
 
-  // Update form data when user data is loaded
-  if (
-    user &&
-    !isEditing &&
-    (formData.name !== user.name ||
-      formData.phone !== user.phone ||
-      formData.address !== user.address)
-  ) {
-    setFormData({
-      name: user.name,
-      phone: user.phone || "",
-      address: user.address || "",
-    });
-  }
+  // Populate formData when user data is available
+  useEffect(() => {
+    if (user) {
+      setFormData({
+        name: user.name || "",
+        phone: user.phone || "",
+        address: user.address || "",
+      });
+    }
+  }, [user]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -75,7 +70,6 @@ export default function PersonalInfoPage() {
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setPasswordData((prev) => ({ ...prev, [name]: value }));
-    // Clear error when typing
     if (passwordErrors[name as keyof typeof passwordErrors]) {
       setPasswordErrors((prev) => ({ ...prev, [name]: "" }));
     }
@@ -88,7 +82,7 @@ export default function PersonalInfoPage() {
   const handleCancel = () => {
     if (user) {
       setFormData({
-        name: user.name,
+        name: user.name || "",
         phone: user.phone || "",
         address: user.address || "",
       });
