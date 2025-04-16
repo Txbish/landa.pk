@@ -184,13 +184,26 @@ const Shop = () => {
         </div>
 
         {/* Category Filter */}
-        <div className="flex overflow-x-auto gap-4 mb-8 pb-2">
+        <div className="flex overflow-x-auto gap-4 mb-8 pb-2 no-scrollbar">
+          {/* All Categories Button */}
+          <button
+            onClick={() => handleCategoryChange("All")}
+            className={`px-4 py-2 rounded-lg whitespace-nowrap transition-colors ${
+              !category
+                ? "bg-landa-green text-white"
+                : "bg-gray-100 hover:bg-gray-200"
+            }`}
+          >
+            All Categories
+          </button>
+
+          {/* Dynamic Category Buttons */}
           {CATEGORIES.map((cat) => (
             <button
               key={cat}
               onClick={() => handleCategoryChange(cat)}
               className={`px-4 py-2 rounded-lg whitespace-nowrap transition-colors ${
-                category === cat || (cat === "All" && !category)
+                category === cat
                   ? "bg-landa-green text-white"
                   : "bg-gray-100 hover:bg-gray-200"
               }`}

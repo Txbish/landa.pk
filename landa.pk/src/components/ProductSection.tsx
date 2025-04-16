@@ -4,6 +4,7 @@ import ProductCard from "./ProductCard";
 import { Product } from "@/lib/types";
 import { CATEGORIES } from "@/lib/categories";
 import { fetchLandingPageProducts } from "../services/productService"; // Import the fetch function
+import Link from "next/link";
 
 const ProductsSection = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
@@ -48,6 +49,19 @@ const ProductsSection = () => {
 
       {/* Category Filter */}
       <div className="flex flex-wrap justify-center gap-2 mb-8">
+        {/* All Categories Button */}
+        <button
+          onClick={() => setSelectedCategory("All")}
+          className={`px-4 py-2 rounded-full transition-colors ${
+            selectedCategory === "All"
+              ? "bg-landa-green text-white"
+              : "bg-gray-100 hover:bg-gray-200"
+          }`}
+        >
+          All Categories
+        </button>
+
+        {/* Dynamic Category Buttons */}
         {CATEGORIES.map((category) => (
           <button
             key={category}
@@ -76,12 +90,9 @@ const ProductsSection = () => {
       )}
 
       <div className="text-center mt-12">
-        <button
-          className="landa-button"
-          onClick={() => alert("Load more functionality not implemented yet!")}
-        >
-          Show More Treasures
-        </button>
+        <Link href="/products">
+          <button className="landa-button">View All Products</button>
+        </Link>
       </div>
     </div>
   );
