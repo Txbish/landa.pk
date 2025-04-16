@@ -77,7 +77,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const updateProfile = useCallback(async (updatedData: Partial<User>) => {
     try {
       const response = await axios.put("/users/profile", updatedData);
-      setUser(response.data);
+      setUser(response.data.user);
     } catch (error: any) {
       console.error(
         "Failed to update profile:",
