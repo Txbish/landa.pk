@@ -126,7 +126,7 @@ export default function DashboardLayout({
 }) {
   return (
     <SidebarProvider>
-      <div className="flex min-h-screen">
+      <div className="flex flex-1 min-h-screen">
         <DashboardSidebar />
         <div className="flex flex-1 flex-col">
           <DashboardNavbar />
