@@ -201,8 +201,9 @@ export default function PersonalInfoPage() {
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
-      <h1 className="text-2xl font-bold">Personal Information</h1>
+      <h1 className="text-2xl shrink font-bold">Personal Information</h1>
 
+      {/* Personal Information Card */}
       <Card>
         <CardHeader>
           <CardTitle>Profile Details</CardTitle>
@@ -294,88 +295,108 @@ export default function PersonalInfoPage() {
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Security</CardTitle>
-          <CardDescription>
-            Manage your password and security settings
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button>Change Password</Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Change Password</DialogTitle>
-                <DialogDescription>
-                  Enter your current password and a new password to update your
-                  credentials.
-                </DialogDescription>
-              </DialogHeader>
-              <form onSubmit={handlePasswordSubmit} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="currentPassword">Current Password</Label>
-                  <Input
-                    id="currentPassword"
-                    name="currentPassword"
-                    type="password"
-                    value={passwordData.currentPassword}
-                    onChange={handlePasswordChange}
-                  />
-                  {passwordErrors.currentPassword && (
-                    <p className="text-sm text-destructive">
-                      {passwordErrors.currentPassword}
-                    </p>
-                  )}
-                </div>
+      {/* Row for Profile Details and Security */}
+      <div className="flex flex-col gap-6 lg:flex-row">
+        {/* Profile Details Card */}
+        <Card className="flex-1">
+          <CardHeader>
+            <CardTitle>Profile Details</CardTitle>
+            <CardDescription>
+              View and update your personal information
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {/* Add any additional content for Profile Details here */}
+            <p>Additional profile details can go here.</p>
+          </CardContent>
+        </Card>
 
-                <div className="space-y-2">
-                  <Label htmlFor="newPassword">New Password</Label>
-                  <Input
-                    id="newPassword"
-                    name="newPassword"
-                    type="password"
-                    value={passwordData.newPassword}
-                    onChange={handlePasswordChange}
-                  />
-                  {passwordErrors.newPassword && (
-                    <p className="text-sm text-destructive">
-                      {passwordErrors.newPassword}
-                    </p>
-                  )}
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="confirmPassword">Confirm New Password</Label>
-                  <Input
-                    id="confirmPassword"
-                    name="confirmPassword"
-                    type="password"
-                    value={passwordData.confirmPassword}
-                    onChange={handlePasswordChange}
-                  />
-                  {passwordErrors.confirmPassword && (
-                    <p className="text-sm text-destructive">
-                      {passwordErrors.confirmPassword}
-                    </p>
-                  )}
-                </div>
-
-                <DialogFooter>
-                  <Button type="submit" disabled={isChangingPassword}>
-                    {isChangingPassword && (
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+        {/* Security Card */}
+        <Card className="w-full lg:w-auto">
+          <CardHeader>
+            <CardTitle>Security</CardTitle>
+            <CardDescription>
+              Manage your password and security settings
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button>Change Password</Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Change Password</DialogTitle>
+                  <DialogDescription>
+                    Enter your current password and a new password to update
+                    your credentials.
+                  </DialogDescription>
+                </DialogHeader>
+                <form onSubmit={handlePasswordSubmit} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="currentPassword">Current Password</Label>
+                    <Input
+                      id="currentPassword"
+                      name="currentPassword"
+                      type="password"
+                      value={passwordData.currentPassword}
+                      onChange={handlePasswordChange}
+                    />
+                    {passwordErrors.currentPassword && (
+                      <p className="text-sm text-destructive">
+                        {passwordErrors.currentPassword}
+                      </p>
                     )}
-                    Change Password
-                  </Button>
-                </DialogFooter>
-              </form>
-            </DialogContent>
-          </Dialog>
-        </CardContent>
-      </Card>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="newPassword">New Password</Label>
+                    <Input
+                      id="newPassword"
+                      name="newPassword"
+                      type="password"
+                      value={passwordData.newPassword}
+                      onChange={handlePasswordChange}
+                    />
+                    {passwordErrors.newPassword && (
+                      <p className="text-sm text-destructive">
+                        {passwordErrors.newPassword}
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="confirmPassword">
+                      Confirm New Password
+                    </Label>
+                    <Input
+                      id="confirmPassword"
+                      name="confirmPassword"
+                      type="password"
+                      value={passwordData.confirmPassword}
+                      onChange={handlePasswordChange}
+                    />
+                    {passwordErrors.confirmPassword && (
+                      <p className="text-sm text-destructive">
+                        {passwordErrors.confirmPassword}
+                      </p>
+                    )}
+                  </div>
+
+                  <DialogFooter>
+                    <Button type="submit" disabled={isChangingPassword}>
+                      {isChangingPassword && (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      )}
+                      Change Password
+                    </Button>
+                  </DialogFooter>
+                </form>
+              </DialogContent>
+            </Dialog>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }
