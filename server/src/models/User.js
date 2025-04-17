@@ -10,6 +10,12 @@ const userSchema = new mongoose.Schema(
       enum: ["user", "seller", "admin"],
       default: "user",
     },
+    cart: [
+      {
+        product: { type: mongoose.Schema.Types.ObjectId, ref: "Product" },
+        addedAt: { type: Date, default: Date.now },
+      },
+    ],
     isBlocked: { type: Boolean, default: false },
     address: { type: String },
     phone: { type: String },

@@ -7,18 +7,19 @@ const {
   getOrderById,
   createOrder,
   updateOrderStatus,
+  updateItemStatus,
 } = require("../controllers/orderController");
 
-router
-  .route("/")
-  .get(authenticate, admin, getAllOrders)
-  .post(authenticate, createOrder);
+router.get("/", authenticate, admin, getAllOrders);
 
-router
-  .route("/:id")
-  .get(authenticate, getOrderById)
-  .put(authenticate, updateOrderStatus);
+router.post("/", authenticate, createOrder);
 
-router.route("/userOrder").get(authenticate, getUserOrders);
+router.get("/userOrder", authenticate, getUserOrders);
 
-module.exports = router;
+router.get("/:id", authenticate, getOrderById);
+
+router.put("/:id", authenticate, updateOrderStatus);
+
+router.put("/:id/item", authenticate, updateItemStatus);
+
+modules.export = router;

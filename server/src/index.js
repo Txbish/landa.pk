@@ -11,6 +11,7 @@ const userRoutes = require("./routes/userRoutes");
 const orderRoutes = require("./routes/orderRoutes");
 const productRoutes = require("./routes/productRoutes");
 const sellerRequestRoutes = require("./routes/sellerRequestRoutes");
+const cartRoutes = require("./routes/cartRoutes");
 const { seedAdmin } = require("./utils/seed");
 
 dotenv.config();
@@ -63,7 +64,7 @@ app.use("/api/products", productRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/seller-requests", sellerRequestRoutes);
-
+app.use("api/cart", cartRoutes);
 // === Default Route ===
 app.get("/", (req, res) => {
   res.send("Welcome to Landa.pk API!");
