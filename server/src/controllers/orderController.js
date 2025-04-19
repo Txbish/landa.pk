@@ -101,8 +101,6 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
   }
 });
 
-const User = require("../models/User"); // Make sure this is imported
-
 const updateItemStatus = asyncHandler(async (req, res) => {
   const { itemId, itemStatus } = req.body;
   const order = await Order.findById(req.params.id);
