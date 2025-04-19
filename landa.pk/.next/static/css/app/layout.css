@@ -801,6 +801,9 @@
   .w-24 {
     width: calc(var(--spacing) * 24);
   }
+  .w-56 {
+    width: calc(var(--spacing) * 56);
+  }
   .w-64 {
     width: calc(var(--spacing) * 64);
   }
@@ -1284,6 +1287,12 @@
   }
   .border-muted {
     border-color: var(--color-muted);
+  }
+  .border-muted-foreground\/20 {
+    border-color: color-mix(in srgb, hsl(var(--muted-foreground)) 20%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      border-color: color-mix(in oklab, var(--color-muted-foreground) 20%, transparent);
+    }
   }
   .border-primary {
     border-color: var(--color-primary);
@@ -2555,6 +2564,11 @@
   .focus\:ring-landa-green {
     &:focus {
       --tw-ring-color: var(--color-landa-green);
+    }
+  }
+  .focus\:ring-primary {
+    &:focus {
+      --tw-ring-color: var(--color-primary);
     }
   }
   .focus\:ring-ring {
