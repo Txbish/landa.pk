@@ -6,7 +6,7 @@ import Footer from "../components/Footer";
 const Index = () => {
   return (
     <div className="min-h-screen bg-landa-cream">
-      <div className="container mx-auto px-4">
+      <div className="w-full mx-auto px-4">
         <Navbar />
 
         {/* Wavy Background Container */}
