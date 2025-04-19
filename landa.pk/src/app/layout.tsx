@@ -6,7 +6,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { AuthProvider } from "../context/AuthContext";
 import { CartProvider } from "../context/CartContext";
 import { Toaster } from "sonner";
-
+import { Cart } from "@/components/cart/Cart";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -32,6 +32,7 @@ export default function RootLayout({
             <CartProvider>
               {children}
               <Toaster position="bottom-right" richColors duration={4000} />
+              <Cart />
             </CartProvider>
           </AuthProvider>
         </ThemeProvider>
