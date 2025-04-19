@@ -24,7 +24,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 
 export default function PersonalInfoPage() {
@@ -47,7 +47,6 @@ export default function PersonalInfoPage() {
   const [isEditing, setIsEditing] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isChangingPassword, setIsChangingPassword] = useState(false);
-  const { showToast } = useToast();
 
   // Populate formData when user data is available
   useEffect(() => {
@@ -101,16 +100,10 @@ export default function PersonalInfoPage() {
         address: formData.address,
       });
       setIsEditing(false);
-      showToast(
-        "Your profile information has been updated successfully",
-        "success",
-        "Profile updated"
-      );
+      toast.success("Your profile information has been updated successfully");
     } catch (error) {
-      showToast(
-        "Failed to update your profile information. Please try again.",
-        "error",
-        "Update failed"
+      toast.error(
+        "Failed to update your profile information. Please try again."
       );
     } finally {
       setIsSubmitting(false);
@@ -167,16 +160,10 @@ export default function PersonalInfoPage() {
         newPassword: "",
         confirmPassword: "",
       });
-      showToast(
-        "Your password has been changed successfully.",
-        "success",
-        "Password changed"
-      );
+      toast.success("Your password has been changed successfully.");
     } catch (error) {
-      showToast(
-        "Failed to change your password. Please check your current password and try again.",
-        "error",
-        "Password change failed"
+      toast.error(
+        "Failed to change your password. Please check your current password and try again."
       );
     } finally {
       setIsChangingPassword(false);

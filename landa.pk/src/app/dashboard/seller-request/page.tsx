@@ -15,7 +15,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { Loader2, Store } from "lucide-react";
 import {
   fetchUserSellerRequest,
@@ -38,7 +38,6 @@ export default function SellerRequestPage() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [fetchingRequest, setFetchingRequest] = useState(true);
-  const { showToast } = useToast();
 
   useEffect(() => {
     const fetchSellerRequest = async () => {
@@ -104,18 +103,14 @@ export default function SellerRequestPage() {
         formData.reason
       );
       setSellerRequest(newRequest);
-      showToast(
-        "Your seller request has been submitted successfully",
-        "success",
-        "Request Submitted"
-      );
+      toast.success("Your seller request has been submitted successfully", {
+        description: "Request Submitted",
+      });
     } catch (error) {
       console.error("Failed to submit seller request:", error);
-      showToast(
-        "Failed to submit your seller request. Please try again.",
-        "error",
-        "Submission failed"
-      );
+      toast.error("Failed to submit your seller request. Please try again.", {
+        description: "Submission failed",
+      });
     } finally {
       setIsSubmitting(false);
     }

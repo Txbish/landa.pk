@@ -27,7 +27,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { Loader2, ShoppingCart } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import {
@@ -44,7 +44,6 @@ export default function MyOrdersPage() {
   const [cancelItemId, setCancelItemId] = useState<string | null>(null);
   const [cancelOrderId, setCancelOrderId] = useState<string | null>(null);
   const [isCancelling, setIsCancelling] = useState(false);
-  const { showToast } = useToast();
 
   useEffect(() => {
     const loadOrders = async () => {
@@ -54,11 +53,7 @@ export default function MyOrdersPage() {
         setOrders(data.orders);
       } catch (error) {
         console.error("Failed to fetch orders:", error);
-        showToast(
-          "Failed to fetch orders. Please try again.",
-          "error",
-          "Error"
-        );
+        toast.error("Failed to fetch orders. Please try again.");
       } finally {
         setIsLoadingOrders(false);
       }
@@ -67,7 +62,7 @@ export default function MyOrdersPage() {
     if (user) {
       loadOrders();
     }
-  }, [user, showToast]);
+  }, [user, toast]);
 
   const handleCancelItem = async () => {
     if (!cancelOrderId) return;
@@ -86,18 +81,10 @@ export default function MyOrdersPage() {
           ),
         }))
       );
-      showToast(
-        "The item has been cancelled successfully.",
-        "success",
-        "Item cancelled"
-      );
+      toast.success("The item has been cancelled successfully.");
     } catch (error) {
       console.error("Failed to cancel item:", error);
-      showToast(
-        "Failed to cancel the item. Please try again.",
-        "error",
-        "Cancellation failed"
-      );
+      toast.error("Failed to cancel the item. Please try again.");
     } finally {
       setIsCancelling(false);
       setCancelItemId(null);
@@ -124,18 +111,10 @@ export default function MyOrdersPage() {
             : order
         )
       );
-      showToast(
-        "The order has been cancelled successfully.",
-        "success",
-        "Order cancelled"
-      );
+      toast.success("The order has been cancelled successfully.");
     } catch (error) {
       console.error("Failed to cancel order:", error);
-      showToast(
-        "Failed to cancel the order. Please try again.",
-        "error",
-        "Cancellation failed"
-      );
+      toast.error("Failed to cancel the order. Please try again.");
     } finally {
       setIsCancelling(false);
       setCancelOrderId(null);
