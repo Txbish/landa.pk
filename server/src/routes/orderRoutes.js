@@ -22,4 +22,4 @@ router.put("/:id", authenticate, updateOrderStatus);
 
 router.put("/:id/item", authenticate, updateItemStatus);
 
-modules.export = router;
+module.exports = router;

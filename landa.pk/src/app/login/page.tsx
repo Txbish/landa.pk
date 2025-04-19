@@ -18,7 +18,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Eye, EyeOff } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
-
+import { toast } from "sonner";
 export default function LoginPage() {
   const router = useRouter();
   const { login } = useAuth();
@@ -68,9 +68,18 @@ export default function LoginPage() {
     setIsLoading(true);
     try {
       const user = await login(formData.email, formData.password);
-      console.log("Logged in as:", user);
+      toast.success("Login successful!");
       router.push("/dashboard");
-    } catch (err) {
+    } catch (err: any) {
+      if (err.message?.toLowerCase().includes("invalid")) {
+        toast.error("Incorrect credentials. Please try again.");
+      } else if (err.message?.toLowerCase().includes("not found")) {
+        toast.error("User not found.");
+      } else if (err.message?.toLowerCase().includes("password")) {
+        toast.error("Wrong password.");
+      } else {
+        toast.error("Login failed. Please try again.");
+      }
       console.error("Login error:", err);
     } finally {
       setIsLoading(false);

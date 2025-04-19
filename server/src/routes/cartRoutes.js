@@ -6,7 +6,7 @@ const {
   removeFromCart,
   clearCart,
 } = require("../controllers/cartController");
-const { authenticate } = require("../middleware/authMiddleware");
+const { authenticate } = require("../middleware/auth");
 
 router.use(authenticate);
 
