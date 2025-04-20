@@ -104,8 +104,8 @@ const getUserProfile = asyncHandler(async (req, res) => {
     profileImage: req.user.profileImage,
     phone: req.user.phone,
     address: req.user.address,
-    sellerDetails: user.sellerDetails,
-    createdAt: user.createdAt,
+    sellerDetails: req.user.sellerDetails,
+    createdAt: req.user.createdAt,
   });
 });
 
