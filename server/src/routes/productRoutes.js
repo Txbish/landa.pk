@@ -3,6 +3,7 @@ const router = express.Router();
 const { authenticate } = require("../middleware/auth");
 const {
   getProducts,
+  getProductById, // <-- Add this line
   createProduct,
   updateProduct,
   deleteProduct,
@@ -12,6 +13,7 @@ router.route("/").get(getProducts).post(authenticate, createProduct);
 
 router
   .route("/:id")
+  .get(getProductById)
   .put(authenticate, updateProduct)
   .delete(authenticate, deleteProduct);
 

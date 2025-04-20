@@ -89,9 +89,20 @@ const deleteProduct = asyncHandler(async (req, res) => {
   await product.deleteOne();
   res.status(200).json({ message: "Product removed" });
 });
-
+const getProductById = asyncHandler(async (req, res) => {
+  const product = await Product.findById(req.params.id).populate(
+    "seller",
+    "name email"
+  );
+  if (!product) {
+    res.status(404);
+    throw new Error("Product not found");
+  }
+  res.status(200).json(product);
+});
 module.exports = {
   getProducts,
+  getProductById,
   createProduct,
   updateProduct,
   deleteProduct,

@@ -1,33 +1,16 @@
-import { Suspense } from "react";
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 import ProductDetail from "@/components/products/product-detail";
 import ProductDetailSkeleton from "@/components/products/product-detail-skeleton";
 import { fetchProductById } from "@/services/productService";
 
-export async function generateMetadata({ params }: { params: { id: string } }) {
-  try {
-    const product = await fetchProductById(params.id);
+type Props = {
+  params: {
+    id: string;
+  };
+};
 
-    return {
-      title: `${product.title} | HawkTU`,
-      description: product.description,
-      openGraph: {
-        images: [{ url: product.image }],
-      },
-    };
-  } catch (error) {
-    return {
-      title: "Product | HawkTU",
-      description: "View product details",
-    };
-  }
-}
-
-export default async function ProductPage({
-  params,
-}: {
-  params: { id: string };
-}) {
+export default async function ProductPage({ params }: Props) {
   try {
     const product = await fetchProductById(params.id);
 

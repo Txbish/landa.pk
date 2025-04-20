@@ -10,7 +10,7 @@ interface ProductCardProps {
 const ProductCard = ({ product }: ProductCardProps) => {
   return (
     <Link
-      href={`/${product._id}`}
+      href={`/products/${product._id}`}
       className="block group rounded-xl overflow-hidden border border-gray-200 bg-white shadow-sm hover:shadow-md transition-all duration-300"
     >
       <div className="relative aspect-square overflow-hidden">
