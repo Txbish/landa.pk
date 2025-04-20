@@ -64,7 +64,7 @@ export function CartProvider({ children }: CartProviderProps) {
     try {
       setLoading(true);
       const response = await axios.get("/cart");
-      setCartItems(response.data.items || []);
+      setCartItems(response.data.cart || []);
     } catch (error) {
       console.error("Failed to fetch cart items:", error);
       toast.error("Failed to load your cart");
@@ -90,8 +90,7 @@ export function CartProvider({ children }: CartProviderProps) {
         const response = await axios.post("/cart", {
           productId: product._id,
         });
-
-        setCartItems(response.data.items);
+        fetchCartItems();
         toast.success("Item added to cart");
       } catch (error) {
         console.error("Failed to add item to cart:", error);

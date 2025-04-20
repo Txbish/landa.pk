@@ -7,6 +7,7 @@ const HeroSection = () => {
       <div className="md:w-1/2 relative z-10 p-4 md:p-6">
         <div className="rounded-xl overflow-hidden shadow-xl border-4 border-white">
           <Image
+            fill
             src="/lovable-uploads/b4818da8-9aff-4496-90a5-e60be7bdf550.png"
             alt="Person shopping at thrift store"
             className="w-full h-full object-cover"
