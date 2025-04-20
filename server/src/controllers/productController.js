@@ -1,6 +1,6 @@
 const asyncHandler = require("express-async-handler");
 const Product = require("../models/Product");
-
+const mongoose = require("mongoose");
 const getProducts = asyncHandler(async (req, res) => {
   const { category, minPrice, maxPrice, sortBy, order, search, limit, page } =
     req.query;
