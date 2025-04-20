@@ -4,13 +4,16 @@ import ProductDetail from "@/components/products/product-detail";
 import ProductDetailSkeleton from "@/components/products/product-detail-skeleton";
 import { fetchProductById } from "@/services/productService";
 
-export default async function ProductPage({
-  params,
-}: {
-  params: { id: string };
-}) {
+type Props = {
+  params: Promise<{
+    id: string;
+  }>;
+};
+
+export default async function ProductPage({ params }: Props) {
   try {
-    const product = await fetchProductById(params.id);
+    const { id } = await params;
+    const product = await fetchProductById(id);
 
     return (
       <div className="container mx-auto px-4 py-8">

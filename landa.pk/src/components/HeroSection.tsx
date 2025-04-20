@@ -1,12 +1,12 @@
 import { Facebook, Instagram, Twitter } from "lucide-react";
-
+import Image from "next/image";
 const HeroSection = () => {
   return (
     <div className="relative flex flex-col md:flex-row items-center overflow-hidden rounded-xl">
       {/* Left Side - Image */}
       <div className="md:w-1/2 relative z-10 p-4 md:p-6">
         <div className="rounded-xl overflow-hidden shadow-xl border-4 border-white">
-          <img
+          <Image
             src="/lovable-uploads/b4818da8-9aff-4496-90a5-e60be7bdf550.png"
             alt="Person shopping at thrift store"
             className="w-full h-full object-cover"

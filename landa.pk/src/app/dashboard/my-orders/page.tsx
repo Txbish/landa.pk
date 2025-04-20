@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -62,7 +63,7 @@ export default function MyOrdersPage() {
     if (user) {
       loadOrders();
     }
-  }, [user, toast]);
+  }, [user]);
 
   const handleCancelItem = async () => {
     if (!cancelOrderId) return;
@@ -222,7 +223,7 @@ export default function MyOrdersPage() {
                       <TableRow key={item._id}>
                         <TableCell className="flex items-center space-x-3">
                           <div className="h-10 w-10 overflow-hidden rounded-md bg-muted">
-                            <img
+                            <Image
                               src={item.product.image || "/placeholder.svg"}
                               alt={item.product.title}
                               className="h-full w-full object-cover"

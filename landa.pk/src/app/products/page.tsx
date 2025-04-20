@@ -63,7 +63,16 @@ const Shop = () => {
     }
 
     loadProducts();
-  }, [category, debouncedSearch, sortBy, order, minPrice, maxPrice, page]);
+  }, [
+    category,
+    debouncedSearch,
+    sortBy,
+    order,
+    minPrice,
+    maxPrice,
+    page,
+    limit,
+  ]);
 
   // Handle filter changes
   const handleCategoryChange = (newCategory: string) => {
@@ -104,7 +113,9 @@ const Shop = () => {
         window.innerHeight + document.documentElement.scrollTop >=
         document.documentElement.offsetHeight - 100
       ) {
-        handleLoadMore();
+        if (page < totalPages && !loading) {
+          setPage((prev) => prev + 1);
+        }
       }
     };
 
