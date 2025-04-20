@@ -11,7 +11,9 @@ export default async function ProductPage({
 }) {
   try {
     const { id } = await params;
+    console.log("Product ID:", id);
     const product = await fetchProductById(id);
+    console.log("Product data:", product);
 
     return (
       <div className="container mx-auto px-4 py-8">
