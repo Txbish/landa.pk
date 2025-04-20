@@ -44,7 +44,7 @@ export function CartProvider({ children }: CartProviderProps) {
   const { isLoggedIn } = useAuth();
 
   const totalItems = useMemo(() => {
-    return cartItems.reduce((total) => total + 1, 0);
+    return cartItems.reduce((total, _item) => total + 1, 0);
   }, [cartItems]);
 
   const totalAmount = useMemo(() => {
