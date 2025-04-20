@@ -87,6 +87,7 @@ const loginUser = asyncHandler(async (req, res) => {
     phone: user.phone || "",
     profileImage: user.profileImage,
     sellerDetails: user.sellerDetails,
+    createdAt: user.createdAt,
   });
 });
 const getUserProfile = asyncHandler(async (req, res) => {
@@ -104,6 +105,7 @@ const getUserProfile = asyncHandler(async (req, res) => {
     phone: req.user.phone,
     address: req.user.address,
     sellerDetails: user.sellerDetails,
+    createdAt: user.createdAt,
   });
 });
 

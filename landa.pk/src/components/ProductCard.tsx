@@ -1,6 +1,7 @@
 import { Product } from "@/lib/types";
 import { Badge } from "./ui/badge";
-import Image from "next/image"; // Import Next.js Image component
+import Image from "next/image";
+import Link from "next/link"; // Import Link
 
 interface ProductCardProps {
   product: Product;
@@ -8,14 +9,17 @@ interface ProductCardProps {
 
 const ProductCard = ({ product }: ProductCardProps) => {
   return (
-    <div className="group rounded-xl overflow-hidden border border-gray-200 bg-white shadow-sm hover:shadow-md transition-all duration-300">
+    <Link
+      href={`/${product._id}`}
+      className="block group rounded-xl overflow-hidden border border-gray-200 bg-white shadow-sm hover:shadow-md transition-all duration-300"
+    >
       <div className="relative aspect-square overflow-hidden">
         <Image
           src={product.image}
           alt={product.title}
-          fill // Automatically fills the parent container
+          fill
           className="object-cover group-hover:scale-105 transition-transform duration-500"
-          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw" // Responsive sizes
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
         />
         {!product.isAvailable && (
           <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
@@ -43,12 +47,13 @@ const ProductCard = ({ product }: ProductCardProps) => {
                 ? "bg-landa-green text-white hover:bg-landa-darkgreen"
                 : "bg-gray-200 text-gray-500 cursor-not-allowed"
             } transition-colors`}
+            onClick={(e) => e.preventDefault()} // Prevent navigation on button click
           >
             {product.isAvailable ? "Add to Cart" : "Sold Out"}
           </button>
         </div>
       </div>
-    </div>
+    </Link>
   );
 };
 

@@ -10,34 +10,7 @@ import React, {
 } from "react";
 import axios from "@/lib/axios";
 
-interface SellerDetails {
-  businessName: string;
-  earnings: number;
-}
-
-interface User {
-  _id: string;
-  name: string;
-  email: string;
-  role: string;
-  address?: string;
-  phone?: string;
-  profileImage?: string;
-  sellerDetails?: SellerDetails;
-}
-
-interface AuthContextType {
-  user: User | null;
-  isLoggedIn: boolean;
-  loading: boolean;
-  login: (email: string, password: string) => Promise<void>;
-  logout: () => Promise<void>;
-  updateProfile: (updatedData: Partial<User>) => Promise<void>;
-  updatePassword: (
-    currentPassword: string,
-    newPassword: string
-  ) => Promise<void>;
-}
+import type { AuthContextType, User } from "@/lib/types";
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
