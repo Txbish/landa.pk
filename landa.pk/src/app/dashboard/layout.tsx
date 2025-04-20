@@ -15,7 +15,7 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
-import { LogOut, User, ShoppingBag, Store } from "lucide-react";
+import { Home, User, ShoppingBag, Store } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
@@ -95,14 +95,12 @@ function DashboardSidebar() {
         </SidebarMenu>
       </SidebarContent>
       <SidebarFooter className="border-t p-4">
-        <Button
-          variant="outline"
-          className="w-full justify-start"
-          onClick={logout}
-        >
-          <LogOut className="mr-2 h-4 w-4" />
-          Logout
-        </Button>
+        <Link href="/">
+          <Button variant="outline" className="w-full justify-start">
+            <Home className="mr-2 h-4 w-4" />
+            Home
+          </Button>
+        </Link>
       </SidebarFooter>
     </Sidebar>
   );
@@ -130,11 +128,7 @@ export default function DashboardLayout({
         <DashboardSidebar />
         <div className="flex flex-1 flex-col">
           <DashboardNavbar />
-          <main className="flex-1 p-6 mx-auto">
-            {" "}
-            {/* Adjusted content width */}
-            {children}
-          </main>
+          <main className="flex-1 p-6 mx-auto"> {children}</main>
         </div>
       </div>
     </SidebarProvider>

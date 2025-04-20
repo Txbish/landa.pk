@@ -86,6 +86,7 @@ const loginUser = asyncHandler(async (req, res) => {
     address: user.address || "",
     phone: user.phone || "",
     profileImage: user.profileImage,
+    sellerDetails: user.sellerDetails,
   });
 });
 const getUserProfile = asyncHandler(async (req, res) => {
@@ -102,6 +103,7 @@ const getUserProfile = asyncHandler(async (req, res) => {
     profileImage: req.user.profileImage,
     phone: req.user.phone,
     address: req.user.address,
+    sellerDetails: user.sellerDetails,
   });
 });
 

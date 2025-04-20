@@ -10,6 +10,11 @@ import React, {
 } from "react";
 import axios from "@/lib/axios";
 
+interface SellerDetails {
+  businessName: string;
+  earnings: number;
+}
+
 interface User {
   _id: string;
   name: string;
@@ -18,6 +23,7 @@ interface User {
   address?: string;
   phone?: string;
   profileImage?: string;
+  sellerDetails?: SellerDetails;
 }
 
 interface AuthContextType {
@@ -58,6 +64,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         address: response.data.address || "",
         phone: response.data.phone || "",
         profileImage: response.data.profileImage || "",
+        sellerDetails: response.data.sellerDetails || undefined, // Add this line
       });
 
       setIsLoggedIn(true);
@@ -88,6 +95,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         address: response.data.address || "",
         phone: response.data.phone || "",
         profileImage: response.data.profileImage || "",
+        sellerDetails: response.data.sellerDetails || undefined,
       });
 
       setIsLoggedIn(true);
