@@ -17,14 +17,13 @@ interface ProductDetailProps {
 }
 
 export default function ProductDetail({ product }: ProductDetailProps) {
-  const [quantity, setQuantity] = useState(1);
   const { addToCart } = useCart();
   const [isAddingToCart, setIsAddingToCart] = useState(false);
 
   const handleAddToCart = async () => {
     try {
       setIsAddingToCart(true);
-      await addToCart(product, quantity);
+      await addToCart(product);
     } catch (error) {
       toast.error("Failed to add product to cart");
     } finally {
@@ -32,18 +31,6 @@ export default function ProductDetail({ product }: ProductDetailProps) {
     }
   };
 
-  const incrementQuantity = () => {
-    setQuantity((prev) => prev + 1);
-  };
-
-  const decrementQuantity = () => {
-    if (quantity > 1) {
-      setQuantity((prev) => prev - 1);
-    }
-  };
-
-  // Create an array of images for the gallery
-  // If product has multiple images, use them, otherwise use the main image
   const galleryImages = [product.image];
 
   return (
@@ -93,28 +80,6 @@ export default function ProductDetail({ product }: ProductDetailProps) {
           <Separator />
 
           <div className="space-y-4">
-            <div className="flex items-center gap-4">
-              <span className="font-medium">Quantity:</span>
-              <div className="flex items-center">
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={decrementQuantity}
-                  disabled={quantity <= 1}
-                >
-                  <Minus className="h-4 w-4" />
-                </Button>
-                <span className="w-12 text-center">{quantity}</span>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={incrementQuantity}
-                >
-                  <Plus className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-
             <div className="flex flex-wrap gap-4">
               <Button
                 className="flex-1 sm:flex-none"
@@ -124,10 +89,6 @@ export default function ProductDetail({ product }: ProductDetailProps) {
               >
                 <ShoppingCart className="mr-2 h-5 w-5" />
                 {isAddingToCart ? "Adding..." : "Add to Cart"}
-              </Button>
-              <Button variant="outline" size="lg">
-                <Heart className="mr-2 h-5 w-5" />
-                Add to Wishlist
               </Button>
             </div>
           </div>

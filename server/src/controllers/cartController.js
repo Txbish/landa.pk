@@ -10,7 +10,6 @@ const getCart = asyncHandler(async (req, res) => {
     throw new Error("User not found");
   }
 
-  // Filter out unavailable or deleted products
   const cleanedCart = user.cart.filter(
     (item) => item.product && item.product.isAvailable
   );

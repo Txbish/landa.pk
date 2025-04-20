@@ -16,8 +16,6 @@ import { toast } from "sonner";
 export interface CartItem {
   _id: string;
   product: Product;
-  quantity: number;
-  price: number;
 }
 
 interface CartContextType {
@@ -26,9 +24,8 @@ interface CartContextType {
   totalItems: number;
   totalAmount: number;
   loading: boolean;
-  addToCart: (product: Product, quantity: number) => Promise<void>;
+  addToCart: (product: Product) => Promise<void>;
   removeFromCart: (itemId: string) => Promise<void>;
-  updateQuantity: (itemId: string, quantity: number) => Promise<void>;
   clearCart: () => Promise<void>;
   toggleCart: () => void;
   closeCart: () => void;
@@ -46,19 +43,14 @@ export function CartProvider({ children }: CartProviderProps) {
   const [loading, setLoading] = useState(true);
   const { isLoggedIn } = useAuth();
 
-  // Calculate total items and amount
   const totalItems = useMemo(() => {
-    return cartItems.reduce((total, item) => total + item.quantity, 0);
+    return cartItems.reduce((total) => total + 1, 0);
   }, [cartItems]);
 
   const totalAmount = useMemo(() => {
-    return cartItems.reduce(
-      (total, item) => total + item.price * item.quantity,
-      0
-    );
+    return cartItems.reduce((total, item) => total + item.product.price, 0);
   }, [cartItems]);
 
-  // Fetch cart items from the backend
   const fetchCartItems = useCallback(async () => {
     if (!isLoggedIn) {
       setCartItems([]);
@@ -85,7 +77,7 @@ export function CartProvider({ children }: CartProviderProps) {
 
   // Add item to cart
   const addToCart = useCallback(
-    async (product: Product, quantity: number) => {
+    async (product: Product) => {
       if (!isLoggedIn) {
         toast.error("Please log in to add items to your cart");
         return;
@@ -94,7 +86,6 @@ export function CartProvider({ children }: CartProviderProps) {
       try {
         const response = await axios.post("/cart", {
           productId: product._id,
-          quantity,
         });
 
         setCartItems(response.data.items);
@@ -107,7 +98,6 @@ export function CartProvider({ children }: CartProviderProps) {
     [isLoggedIn]
   );
 
-  // Remove item from cart
   const removeFromCart = useCallback(async (itemId: string) => {
     try {
       const response = await axios.delete(`/cart/${itemId}`);
@@ -119,21 +109,6 @@ export function CartProvider({ children }: CartProviderProps) {
     }
   }, []);
 
-  // Update item quantity
-  const updateQuantity = useCallback(
-    async (itemId: string, quantity: number) => {
-      try {
-        const response = await axios.put(`/cart/${itemId}`, { quantity });
-        setCartItems(response.data.items);
-      } catch (error) {
-        console.error("Failed to update item quantity:", error);
-        toast.error("Failed to update item quantity");
-      }
-    },
-    []
-  );
-
-  // Clear cart
   const clearCart = useCallback(async () => {
     try {
       await axios.delete("/cart");
@@ -145,12 +120,10 @@ export function CartProvider({ children }: CartProviderProps) {
     }
   }, []);
 
-  // Toggle cart visibility
   const toggleCart = useCallback(() => {
     setIsCartOpen((prev) => !prev);
   }, []);
 
-  // Close cart
   const closeCart = useCallback(() => {
     setIsCartOpen(false);
   }, []);
@@ -164,7 +137,6 @@ export function CartProvider({ children }: CartProviderProps) {
       loading,
       addToCart,
       removeFromCart,
-      updateQuantity,
       clearCart,
       toggleCart,
       closeCart,
@@ -177,7 +149,6 @@ export function CartProvider({ children }: CartProviderProps) {
       loading,
       addToCart,
       removeFromCart,
-      updateQuantity,
       clearCart,
       toggleCart,
       closeCart,
