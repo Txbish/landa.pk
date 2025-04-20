@@ -91,6 +91,10 @@ const deleteProduct = asyncHandler(async (req, res) => {
 });
 
 const getProductById = asyncHandler(async (req, res) => {
+  if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+    res.status(400);
+    throw new Error("Invalid product ID");
+  }
   const product = await Product.findById(req.params.id).populate(
     "seller",
     "name email"
