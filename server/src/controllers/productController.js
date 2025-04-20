@@ -89,6 +89,7 @@ const deleteProduct = asyncHandler(async (req, res) => {
   await product.deleteOne();
   res.status(200).json({ message: "Product removed" });
 });
+
 const getProductById = asyncHandler(async (req, res) => {
   const product = await Product.findById(req.params.id).populate(
     "seller",
@@ -100,10 +101,32 @@ const getProductById = asyncHandler(async (req, res) => {
   }
   res.status(200).json(product);
 });
+
+const getRelatedProducts = asyncHandler(async (req, res) => {
+  const product = await Product.findById(req.params.id);
+
+  if (!product) {
+    res.status(404);
+    throw new Error("Product not found");
+  }
+
+  const limit = parseInt(req.query.limit) || 4;
+
+  const relatedProducts = await Product.find({
+    _id: { $ne: product._id },
+    category: product.category,
+  })
+    .limit(limit)
+    .populate("seller", "name email");
+
+  res.status(200).json(relatedProducts);
+});
+
 module.exports = {
   getProducts,
   getProductById,
   createProduct,
   updateProduct,
   deleteProduct,
+  getRelatedProducts,
 };
