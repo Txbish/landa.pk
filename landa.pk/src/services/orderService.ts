@@ -15,7 +15,7 @@ export const fetchOrderById = async (orderId: string) => {
 
 // Create a new order
 export const createOrder = async (orderData: {
-  items: { product: string; quantity: number; price: number }[];
+  items: { product: string;  price: number }[];
   totalAmount: number;
 }) => {
   const response = await axiosInstance.post("/orders", orderData);

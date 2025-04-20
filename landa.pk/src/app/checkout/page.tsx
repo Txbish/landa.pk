@@ -64,8 +64,7 @@ export default function CheckoutPage() {
       const orderData = {
         items: cartItems.map((item) => ({
           product: item.product._id,
-          quantity: item.quantity,
-          price: item.price,
+          price: item.product.price,
         })),
         totalAmount,
         shippingAddress: formData.address,
@@ -221,12 +220,8 @@ export default function CheckoutPage() {
                       <p className="font-medium line-clamp-1">
                         {item.product.title}
                       </p>
-                      <p className="text-sm text-muted-foreground">
-                        Qty: {item.quantity}
-                      </p>
-                      <p className="font-medium">
-                        Rs. {item.price * item.quantity}
-                      </p>
+                      <p className="text-sm text-muted-foreground">Qty: 1</p>
+                      <p className="font-medium">Rs. {item.product.price}</p>
                     </div>
                   </div>
                 ))}
