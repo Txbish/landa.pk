@@ -20,6 +20,7 @@ landa.pk/node_modules/
 # Next.js build output (in frontend)
 landa.pk/.next/
 landa.pk/out/
+
 landa.pk/.vercel/
 
 # General build output

@@ -4,13 +4,11 @@ import ProductDetail from "@/components/products/product-detail";
 import ProductDetailSkeleton from "@/components/products/product-detail-skeleton";
 import { fetchProductById } from "@/services/productService";
 
-type Props = {
-  params: {
-    id: string;
-  };
-};
-
-export default async function ProductPage({ params }: Props) {
+export default async function ProductPage({
+  params,
+}: {
+  params: { id: string };
+}) {
   try {
     const product = await fetchProductById(params.id);
 
