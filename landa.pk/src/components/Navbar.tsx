@@ -17,7 +17,7 @@ import { User, ShoppingCart } from "lucide-react";
 
 export default function Header() {
   const pathname = usePathname();
-  const { user, isLoggedIn, logout } = useAuth();
+  const { user, isLoggedIn, logout, loading } = useAuth();
 
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-background">
@@ -65,7 +65,9 @@ export default function Header() {
         </div>
         <div className="flex items-center gap-4">
           <CartButton />
-          {isLoggedIn ? (
+          {loading ? (
+            <div className="w-20 h-10 bg-gray-200 animate-pulse rounded"></div>
+          ) : isLoggedIn ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button

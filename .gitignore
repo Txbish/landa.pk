@@ -1,11 +1,9 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-
-# Node modules (client and server)
+# Node modules
 node_modules/
 server/node_modules/
 landa.pk/node_modules/
 
-# Dependencies and package managers
+# Yarn / pnpm
 /pnp
 .pnp.*
 .yarn/*
@@ -15,21 +13,30 @@ landa.pk/node_modules/
 !.yarn/versions
 
 # Environment files
+.env
+**/.env
+!.env.example
 
+# Next.js build output (in frontend)
+landa.pk/.next/
+landa.pk/out/
+landa.pk/.vercel/
 
-# Next.js files
-/.next/
-/out/
-
-# Build output
+# General build output
 /build
 /dist
 
-# Vercel and deployment
-.vercel
+# Logs and debug
+*.log
+*.log.*
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
 
-# Testing and coverage
-/coverage
+# Testing
+coverage/
 *.test.js
 *.spec.js
 *.test.ts
@@ -39,19 +46,6 @@ jest.config.js
 # Misc
 .DS_Store
 *.pem
-*.log
-logs/
-*.log.*
-
-# Ignore all .env files
-.env
-**/.env
-
-# Debug files
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
 
 # TypeScript
 *.tsbuildinfo
