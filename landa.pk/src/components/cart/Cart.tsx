@@ -104,9 +104,9 @@ export function Cart() {
                         {item.product.category}
                       </p>
                       <div className="flex justify-between items-end mt-auto">
-                        <div className="text-sm">Qty: {item.quantity}</div>
+                        <div className="text-sm">Qty: 1</div>
                         <div className="font-medium">
-                          Rs. {item.price * item.quantity}
+                          Rs. {item.product.price}
                         </div>
                       </div>
                     </div>
