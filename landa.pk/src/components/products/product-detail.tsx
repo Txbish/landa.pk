@@ -132,24 +132,6 @@ export default function ProductDetail({ product }: ProductDetailProps) {
             </div>
           </div>
 
-          {/* Additional Product Details */}
-          {product.description && (
-            <>
-              <Separator />
-              <div className="space-y-4">
-                <h2 className="text-xl font-semibold">Specifications</h2>
-                <ul className="space-y-2">
-                  {Object.entries(product.description).map(([key, value]) => (
-                    <li key={key} className="flex">
-                      <span className="w-1/3 font-medium">{key}:</span>
-                      <span className="w-2/3">{value}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </>
-          )}
-
           {/* Seller Information */}
           {product.seller && (
             <>
@@ -178,7 +160,6 @@ export default function ProductDetail({ product }: ProductDetailProps) {
         </div>
       </div>
 
-      {/* Related Products */}
       <Separator className="my-12" />
       <RelatedProducts productId={product._id} />
     </div>

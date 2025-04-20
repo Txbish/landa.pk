@@ -97,7 +97,7 @@ const getProductById = asyncHandler(async (req, res) => {
   }
   const product = await Product.findById(req.params.id).populate(
     "seller",
-    "name email"
+    "name email createdAt"
   );
   if (!product) {
     res.status(404);
