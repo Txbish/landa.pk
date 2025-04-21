@@ -69,7 +69,11 @@ const removeFromCart = asyncHandler(async (req, res) => {
     throw new Error("User not found");
   }
 
-  user.cart = user.cart.filter((p) => p.product._id.toString() !== productId);
+  user.cart = user.cart.filter(
+    (p) =>
+      (p.product._id ? p.product._id.toString() : p.product.toString()) !==
+      productId
+  );
   await user.save();
 
   // Populate the updated cart
