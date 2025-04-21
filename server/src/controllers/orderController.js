@@ -66,7 +66,6 @@ const createOrder = asyncHandler(async (req, res) => {
 
     orderItems.push({
       product: product._id,
-      seller: product.seller,
       itemStatus: "Pending",
     });
   }
