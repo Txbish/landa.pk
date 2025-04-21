@@ -90,7 +90,7 @@ export function CartProvider({ children }: CartProviderProps) {
         const response = await axios.post("/cart", {
           productId: product._id,
         });
-        fetchCartItems();
+        setCartItems(response.data.cart);
         toast.success("Item added to cart");
       } catch (error) {
         console.error("Failed to add item to cart:", error);
@@ -103,7 +103,7 @@ export function CartProvider({ children }: CartProviderProps) {
   const removeFromCart = useCallback(async (itemId: string) => {
     try {
       const response = await axios.delete(`/cart/${itemId}`);
-      setCartItems(response.data.items);
+      setCartItems(response.data.cart);
       toast.success("Item removed from cart");
     } catch (error) {
       console.error("Failed to remove item from cart:", error);

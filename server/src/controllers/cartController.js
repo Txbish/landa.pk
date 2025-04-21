@@ -51,7 +51,13 @@ const addToCart = asyncHandler(async (req, res) => {
   user.cart.push({ product: productId });
   await user.save();
 
-  res.status(200).json({ message: "Added to cart" });
+  // Populate the updated cart
+  await user.populate("cart.product");
+  const cleanedCart = user.cart.filter(
+    (item) => item.product && item.product.isAvailable
+  );
+
+  res.status(200).json({ cart: cleanedCart });
 });
 
 const removeFromCart = asyncHandler(async (req, res) => {
@@ -66,7 +72,13 @@ const removeFromCart = asyncHandler(async (req, res) => {
   user.cart = user.cart.filter((p) => p.product.toString() !== productId);
   await user.save();
 
-  res.status(200).json({ message: "Removed from cart" });
+  // Populate the updated cart
+  await user.populate("cart.product");
+  const cleanedCart = user.cart.filter(
+    (item) => item.product && item.product.isAvailable
+  );
+
+  res.status(200).json({ cart: cleanedCart });
 });
 
 const clearCart = asyncHandler(async (req, res) => {
