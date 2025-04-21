@@ -39,7 +39,6 @@ export interface Product {
   isAvailable: boolean;
 }
 
-// Paginated response for products
 export interface PaginatedProductsResponse {
   products: Product[];
   totalPages: number;
@@ -47,7 +46,13 @@ export interface PaginatedProductsResponse {
   totalProducts: number;
 }
 
-// User type
+export interface CreateOrderPayload {
+  shippingAddress: string;
+  additionalNotes?: string;
+  contactName: string;
+  contactEmail: string;
+  contactPhone: string;
+}
 
 // Order item type
 export interface OrderItem {

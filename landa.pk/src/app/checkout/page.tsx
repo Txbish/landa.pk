@@ -21,6 +21,7 @@ import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { Contact } from "lucide-react";
 
 export default function CheckoutPage() {
   const { cartItems, totalAmount, clearCart } = useCart();
@@ -60,15 +61,12 @@ export default function CheckoutPage() {
     try {
       setLoading(true);
 
-      // Prepare order data
       const orderData = {
-        items: cartItems.map((item) => ({
-          product: item.product._id,
-          price: item.product.price,
-        })),
-        totalAmount,
         shippingAddress: formData.address,
         additionalNotes: formData.additionalNotes,
+        contactName: formData.name,
+        contactEmail: formData.email,
+        contactPhone: formData.phone,
       };
 
       // Create order
@@ -233,10 +231,6 @@ export default function CheckoutPage() {
                 <div className="flex justify-between">
                   <span>Subtotal</span>
                   <span>Rs. {totalAmount}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Shipping</span>
-                  <span>Calculated at next step</span>
                 </div>
                 <Separator className="my-2" />
                 <div className="flex justify-between font-medium text-lg">

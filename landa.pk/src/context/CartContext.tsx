@@ -92,9 +92,13 @@ export function CartProvider({ children }: CartProviderProps) {
         });
         setCartItems(response.data.cart);
         toast.success("Item added to cart");
-      } catch (error) {
+      } catch (error: any) {
+        const message =
+          error.response?.data?.message ||
+          error.message ||
+          "An unknown error occurred";
+        toast.error(message);
         console.error("Failed to add item to cart:", error);
-        toast.error("Failed to add item to cart");
       }
     },
     [isLoggedIn]

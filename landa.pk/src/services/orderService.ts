@@ -1,5 +1,5 @@
 import axiosInstance from "@/lib/axios";
-
+import { CreateOrderPayload } from "@/lib/types";
 export const fetchOrders = async () => {
   const response = await axiosInstance.get("/orders");
   return response.data;
@@ -14,10 +14,7 @@ export const fetchOrderById = async (orderId: string) => {
 };
 
 // Create a new order
-export const createOrder = async (orderData: {
-  items: { product: string;  price: number }[];
-  totalAmount: number;
-}) => {
+export const createOrder = async (orderData: CreateOrderPayload) => {
   const response = await axiosInstance.post("/orders", orderData);
   return response.data; // Returns the created order
 };

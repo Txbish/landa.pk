@@ -33,6 +33,7 @@ const getOrderById = asyncHandler(async (req, res) => {
 
 const createOrder = asyncHandler(async (req, res) => {
   const userId = req.user._id;
+  const { shippingAddress, additionalNotes } = req.body;
 
   const user = await User.findById(userId).populate("cart.product");
 
@@ -72,6 +73,11 @@ const createOrder = asyncHandler(async (req, res) => {
     user: userId,
     items: orderItems,
     totalAmount,
+    shippingAddress,
+    contactName: user.name,
+    contactEmail: user.email,
+    contactPhone: user.phone,
+    additionalNotes,
   });
 
   // 🧹 Clear cart
