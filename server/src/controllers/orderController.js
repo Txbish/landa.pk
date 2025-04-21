@@ -1,7 +1,7 @@
 const asyncHandler = require("express-async-handler");
 const Order = require("../models/Order");
 const Product = require("../models/Product");
-
+const User = require("../models/User");
 // Get all orders by logged-in user
 const getUserOrders = asyncHandler(async (req, res) => {
   const userId = req.user._id;
