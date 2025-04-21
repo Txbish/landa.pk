@@ -41,7 +41,7 @@ const addToCart = asyncHandler(async (req, res) => {
   }
 
   const alreadyInCart = user.cart.some(
-    (p) => p.product.toString() === productId
+    (p) => p.product._id.toString() === productId
   );
   if (alreadyInCart) {
     res.status(400);
@@ -69,7 +69,7 @@ const removeFromCart = asyncHandler(async (req, res) => {
     throw new Error("User not found");
   }
 
-  user.cart = user.cart.filter((p) => p.product.toString() !== productId);
+  user.cart = user.cart.filter((p) => p.product._id.toString() !== productId);
   await user.save();
 
   // Populate the updated cart
