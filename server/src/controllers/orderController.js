@@ -35,9 +35,15 @@ const createOrder = asyncHandler(async (req, res) => {
   const userId = req.user._id;
   const { shippingAddress, additionalNotes } = req.body;
 
+  console.log("[createOrder] userId:", userId);
+  console.log("[createOrder] shippingAddress:", shippingAddress);
+  console.log("[createOrder] additionalNotes:", additionalNotes);
+
   const user = await User.findById(userId).populate("cart.product");
+  console.log("[createOrder] user:", user);
 
   if (!user || !user.cart || user.cart.length === 0) {
+    console.error("[createOrder] Cart is empty or user not found");
     res.status(400);
     throw new Error("Your cart is empty");
   }
@@ -46,14 +52,17 @@ const createOrder = asyncHandler(async (req, res) => {
 
   for (const item of user.cart) {
     const product = item.product;
+    console.log("[createOrder] Checking product:", product);
 
     if (!product || !product.isAvailable) {
+      console.error("[createOrder] Product not available:", product?._id);
       res.status(400);
       throw new Error(`Product not available: ${item.product?._id}`);
     }
 
     product.isAvailable = false;
     await product.save();
+    console.log("[createOrder] Marked product as unavailable:", product._id);
 
     orderItems.push({
       product: product._id,
@@ -62,12 +71,16 @@ const createOrder = asyncHandler(async (req, res) => {
     });
   }
 
+  console.log("[createOrder] orderItems:", orderItems);
+
   const totalAmount = orderItems.reduce((acc, item) => {
     const product = user.cart.find((c) =>
       c.product._id.equals(item.product)
     ).product;
     return acc + product.price;
   }, 0);
+
+  console.log("[createOrder] totalAmount:", totalAmount);
 
   const order = await Order.create({
     user: userId,
@@ -80,9 +93,12 @@ const createOrder = asyncHandler(async (req, res) => {
     additionalNotes,
   });
 
+  console.log("[createOrder] Created order:", order);
+
   // 🧹 Clear cart
   user.cart = [];
   await user.save();
+  console.log("[createOrder] Cleared user cart");
 
   res.status(201).json(order);
 });
