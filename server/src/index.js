@@ -30,35 +30,35 @@ app.use(express.json());
 app.use(cookieParser());
 
 // === CORS Middleware ===
-// app.use(
-//   cors({
-//     origin: (origin, callback) => {
-//       console.log("CORS Origin:", origin); // Debug line
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      console.log("CORS Origin:", origin); // Debug line
 
-//       if (!origin || allowedOrigins.includes(origin)) {
-//         callback(null, true);
-//       } else {
-//         callback(new Error("Not allowed by CORS"), false);
-//       }
-//     },
-//     credentials: true,
-//   })
-// );
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"), false);
+      }
+    },
+    credentials: true,
+  })
+);
 
-// // === Handle Preflight (OPTIONS) Requests Globally ===
-// app.options(
-//   "*",
-//   cors({
-//     origin: (origin, callback) => {
-//       if (!origin || allowedOrigins.includes(origin)) {
-//         callback(null, true);
-//       } else {
-//         callback(new Error("Not allowed by CORS"), false);
-//       }
-//     },
-//     credentials: true,
-//   })
-// );
+// === Handle Preflight (OPTIONS) Requests Globally ===
+app.options(
+  "*",
+  cors({
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"), false);
+      }
+    },
+    credentials: true,
+  })
+);
 
 // === Session Middleware ===
 app.use(

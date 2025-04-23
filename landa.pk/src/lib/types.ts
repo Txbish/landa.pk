@@ -54,22 +54,24 @@ export interface CreateOrderPayload {
   contactPhone: string;
 }
 
-// Order item type
 export interface OrderItem {
   _id: string;
-  product: Product; // Reference to the Product type
-  itemStatus: "Pending" | "Cancelled" | "Completed"; // Status of the item in the order
+  product: Product; 
+  itemStatus: "Pending" | "Cancelled" | "Completed"; 
 }
-
-// Order type
 export interface Order {
-  _id: string;
-  user: User; // Reference to the User type
-  items: OrderItem[]; // List of items in the order
-  totalAmount: number; // Total amount for the order
-  overallStatus: "Pending" | "Cancelled" | "Completed"; // Overall status of the order
-  createdAt: string; // Timestamp for when the order was created
-  updatedAt: string; // Timestamp for when the order was last updated
+  _id: string
+  user: User | string
+  items: OrderItem[]
+  totalAmount: number
+  overallStatus: "Pending" | "Cancelled" | "Completed"
+  shippingAddress: string
+  contactName: string
+  contactEmail: string
+  contactPhone: string
+  additionalNotes?: string
+  createdAt: string
+  updatedAt: string
 }
 
 // Seller request type
