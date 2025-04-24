@@ -39,17 +39,31 @@ import { format } from "date-fns";
 export default function OrderDetailsPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
-  const router = useRouter();
+  const [id, setID] = useState<string>("");
   const [order, setOrder] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
+
+  useEffect(() => {
+    const init = async () => {
+      try {
+        const { id } = await params;
+        setID(id);
+      } catch (error) {
+        console.error("Error retrieving order ID from params:", error);
+      }
+    };
+    init();
+  }, [params]);
 
   useEffect(() => {
     const fetchOrder = async () => {
+      if (!id) return;
       setLoading(true);
       try {
-        const data = await fetchOrderById(params.id);
+        const data = await fetchOrderById(id);
         setOrder(data);
       } catch (error) {
         console.error("Error fetching order:", error);
@@ -57,15 +71,14 @@ export default function OrderDetailsPage({
         setLoading(false);
       }
     };
-
     fetchOrder();
-  }, [params.id]);
+  }, [id]);
 
   const handleUpdateOrderStatus = async (
     status: "Pending" | "Cancelled" | "Completed"
   ) => {
     try {
-      const updatedOrder = await updateOrderStatus(params.id, status);
+      const updatedOrder = await updateOrderStatus(id, status);
       setOrder(updatedOrder);
     } catch (error) {
       console.error("Error updating order status:", error);
@@ -77,7 +90,7 @@ export default function OrderDetailsPage({
     status: "Pending" | "Cancelled" | "Completed"
   ) => {
     try {
-      const updatedOrder = await updateItemStatus(params.id, itemId, status);
+      const updatedOrder = await updateItemStatus(id, itemId, status);
       setOrder(updatedOrder);
     } catch (error) {
       console.error("Error updating item status:", error);
