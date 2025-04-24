@@ -96,7 +96,7 @@ export function EditProductModal({
       data.append("isAvailable", String(formData.isAvailable));
       if (imageFile) {
         data.append("image", imageFile);
-      } else {
+      } else if (imagePreview === null && product.image) {
         data.append("image", "");
       }
 
