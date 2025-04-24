@@ -79,11 +79,20 @@ const createProduct = asyncHandler(async (req, res) => {
   let imageUrl;
 
   if (req.file) {
-    const uploadResult = await uploadToCloudinary(req.file.buffer);
-    imageUrl = uploadResult.secure_url;
+    try {
+      console.log("Uploaded file info:", req.file);
+
+      const uploadResult = await uploadToCloudinary(req.file.buffer);
+      imageUrl = uploadResult.secure_url;
+    } catch (err) {
+      console.error("Cloudinary Upload Error:", err.message, err);
+      res.status(500);
+      throw new Error("Failed to upload image to Cloudinary");
+    }
   }
 
   if (!title || !price || !imageUrl) {
+    console.error("Missing fields:", { title, price, imageUrl });
     res.status(400);
     throw new Error("Title, price, and image are required");
   }
