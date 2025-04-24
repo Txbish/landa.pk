@@ -124,8 +124,9 @@ const createProduct = asyncHandler(async (req, res) => {
 });
 
 const getSellerProducts = asyncHandler(async (req, res) => {
+  console.log("req.user:", req.user);
   const sellerId = req.user._id;
-  const { includeDeleted, limit, page, search, sortBy, sortOrder } = req.query;
+  const { includeDeleted, limit, page, search, sortBy, order } = req.query;
 
   const query = { seller: sellerId };
 
@@ -149,8 +150,8 @@ const getSellerProducts = asyncHandler(async (req, res) => {
   const skip = (currentPage - 1) * itemsPerPage;
 
   const sortOptions = {};
-  if (sortBy && sortOrder) {
-    sortOptions[sortBy] = sortOrder === "asc" ? 1 : -1;
+  if (sortBy && order) {
+    sortOptions[sortBy] = order === "asc" ? 1 : -1;
   }
   sortOptions.createdAt = -1;
 
