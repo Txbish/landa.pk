@@ -18,17 +18,28 @@ const getUserSellerRequest = asyncHandler(async (req, res) => {
   res.status(200).json(sellerRequest);
 });
 const createSellerRequest = asyncHandler(async (req, res) => {
-  const { businessName } = req.body;
+  const { businessName, reason } = req.body;
 
-  const existingRequest = await SellerRequest.findOne({ user: req.user._id });
+  let existingRequest = await SellerRequest.findOne({ user: req.user._id });
+
   if (existingRequest) {
-    res.status(400);
-    throw new Error("Seller request already exists for this user");
+    if (existingRequest.status === "Rejected") {
+      // Allow re-apply: update the existing request
+      existingRequest.businessName = businessName;
+      existingRequest.reason = reason;
+      existingRequest.status = "Pending";
+      await existingRequest.save();
+      return res.status(200).json(existingRequest);
+    } else {
+      res.status(400);
+      throw new Error("Seller request already exists for this user");
+    }
   }
 
   const sellerRequest = await SellerRequest.create({
     user: req.user._id,
     businessName,
+    reason,
   });
 
   res.status(201).json(sellerRequest);

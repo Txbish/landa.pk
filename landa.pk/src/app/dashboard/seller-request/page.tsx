@@ -40,19 +40,19 @@ export default function SellerRequestPage() {
   const [fetchingRequest, setFetchingRequest] = useState(true);
 
   useEffect(() => {
-    const fetchSellerRequest = async () => {
+    const fetchSellerRequestData = async () => {
       try {
         const data = await fetchUserSellerRequest();
         setSellerRequest(data);
       } catch (error) {
-        console.error("Failed to fetch seller request:", error);
+        setSellerRequest(null);
       } finally {
         setFetchingRequest(false);
       }
     };
 
     if (user) {
-      fetchSellerRequest();
+      fetchSellerRequestData();
     } else {
       setFetchingRequest(false);
     }
@@ -106,11 +106,17 @@ export default function SellerRequestPage() {
       toast.success("Your seller request has been submitted successfully", {
         description: "Request Submitted",
       });
-    } catch (error) {
-      console.error("Failed to submit seller request:", error);
-      toast.error("Failed to submit your seller request. Please try again.", {
-        description: "Submission failed",
-      });
+    } catch (error: any) {
+      if (
+        error.response?.status === 400 &&
+        error.response?.data?.message?.includes("already exists")
+      ) {
+        toast.error("You already have a pending seller request.");
+      } else {
+        toast.error("Failed to submit your seller request. Please try again.", {
+          description: "Submission failed",
+        });
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -143,7 +149,8 @@ export default function SellerRequestPage() {
     );
   }
 
-  if (sellerRequest) {
+  // Show status if request is pending or approved
+  if (sellerRequest && sellerRequest.status !== "Rejected") {
     return (
       <div className="mx-auto max-w-3xl space-y-6">
         <h1 className="text-2xl font-bold">Seller Request</h1>
@@ -151,7 +158,9 @@ export default function SellerRequestPage() {
           <CardHeader>
             <CardTitle>Seller Application Status</CardTitle>
             <CardDescription>
-              Your request to become a seller is being processed
+              {sellerRequest.status === "Pending"
+                ? "Your request is under review. Not approved yet by admin."
+                : "Your request has been approved!"}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
@@ -160,9 +169,7 @@ export default function SellerRequestPage() {
                 className={
                   sellerRequest.status === "Pending"
                     ? "bg-yellow-100 text-yellow-800"
-                    : sellerRequest.status === "Approved"
-                    ? "bg-green-100 text-green-800"
-                    : "bg-red-100 text-red-800"
+                    : "bg-green-100 text-green-800"
                 }
               >
                 {sellerRequest.status}
@@ -201,8 +208,8 @@ export default function SellerRequestPage() {
           <CardFooter>
             {sellerRequest.status === "Pending" && (
               <p className="text-sm text-muted-foreground">
-                Your application is currently under review. We'll notify you
-                once a decision has been made.
+                Your application is currently under review. Not approved yet by
+                admin.
               </p>
             )}
             {sellerRequest.status === "Approved" && (
@@ -214,21 +221,29 @@ export default function SellerRequestPage() {
                 <Button className="w-full">Go to Seller Dashboard</Button>
               </div>
             )}
-            {sellerRequest.status === "Rejected" && (
-              <p className="text-sm text-red-600">
-                Unfortunately, your seller application has been rejected. Please
-                contact support for more information.
-              </p>
-            )}
           </CardFooter>
         </Card>
       </div>
     );
   }
 
+  // If rejected or no request, show the form (allow re-apply)
   return (
     <div className="mx-auto max-w-3xl space-y-6">
       <h1 className="text-2xl font-bold">Become a Seller</h1>
+      {sellerRequest && sellerRequest.status === "Rejected" && (
+        <Card className="mb-6">
+          <CardContent className="py-6">
+            <div className="flex flex-col items-center">
+              <Badge className="bg-red-100 text-red-800 mb-2">Rejected</Badge>
+              <p className="text-red-600 text-center">
+                Your previous seller application was rejected. You can apply
+                again below.
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      )}
       <Card>
         <CardHeader>
           <CardTitle>Seller Application</CardTitle>

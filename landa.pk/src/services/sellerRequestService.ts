@@ -17,3 +17,16 @@ export const submitSellerRequest = async (businessName: string, reason: string):
   const response = await axiosInstance.post("/seller-requests", { businessName, reason });
   return response.data;
 };
+
+export const fetchAllSellerRequests = async (): Promise<SellerRequest[]> => {
+  const response = await axiosInstance.get("/seller-requests/all");
+  return response.data;
+};
+
+export const handleSellerRequest = async (
+  id: string,
+  status: "Approved" | "Rejected"
+): Promise<SellerRequest> => {
+  const response = await axiosInstance.put(`/seller-requests/${id}`, { status });
+  return response.data;
+};
