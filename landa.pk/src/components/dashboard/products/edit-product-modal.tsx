@@ -94,9 +94,10 @@ export function EditProductModal({
       data.append("price", formData.price);
       data.append("category", formData.category);
       data.append("isAvailable", String(formData.isAvailable));
-      // Only append image if a new file is selected
       if (imageFile) {
         data.append("image", imageFile);
+      } else {
+        data.append("image", "");
       }
 
       const response = await axios.put(`/products/${product._id}`, data, {

@@ -9,6 +9,7 @@ const productSchema = new mongoose.Schema(
     image: { type: String, required: true },
     seller: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
     isAvailable: { type: Boolean, default: true },
+    isDeleted: { type: Boolean, default: false },
   },
   { timestamps: true }
 );

@@ -11,6 +11,8 @@ interface FetchProductsParams {
   search?: string
   page?: number
   limit?: number
+  includeDeleted?: boolean
+  isAvailable?: boolean
 }
 
 export async function fetchLandingPageProducts(params?: FetchProductsParams): Promise<PaginatedProductsResponse> {
@@ -23,6 +25,10 @@ export async function fetchProducts(params?: FetchProductsParams): Promise<Pagin
   return response.data
 }
 
+export async function fetchSellerProducts(params?: FetchProductsParams): Promise<PaginatedProductsResponse> {
+  const response = await axios.get<PaginatedProductsResponse>("/products/seller", { params })
+  return response.data
+}
 export async function fetchProductById(id: string): Promise<Product> {
   const response = await axios.get<Product>(`/products/${id}`)
   return response.data

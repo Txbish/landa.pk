@@ -2,7 +2,7 @@
 
 import { useAuth } from "@/context/AuthContext";
 import { useEffect, useState } from "react";
-import { fetchProducts } from "@/services/productService";
+import { fetchSellerProducts } from "@/services/productService";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
@@ -39,16 +39,18 @@ export default function ProductsPage() {
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [includeDeleted, setIncludeDeleted] = useState(false);
 
   useEffect(() => {
     const loadProducts = async () => {
       try {
         setLoading(true);
 
-        const data = await fetchProducts({
+        const data = await fetchSellerProducts({
           sortBy,
           order: sortOrder,
           search: searchTerm || undefined,
+          includeDeleted,
         });
 
         const sellerProducts = data.products.filter(
@@ -96,11 +98,19 @@ export default function ProductsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
         <h1 className="text-2xl font-bold tracking-tight">Products</h1>
-        <Button onClick={() => setAddModalOpen(true)}>
-          <Plus className="mr-2 h-4 w-4" /> Add Product
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            onClick={() => setIncludeDeleted((prev) => !prev)}
+          >
+            {includeDeleted ? "Hide Deleted" : "Show Deleted"}
+          </Button>
+          <Button onClick={() => setAddModalOpen(true)}>
+            <Plus className="mr-2 h-4 w-4" /> Add Product
+          </Button>
+        </div>
       </div>
 
       <Card>

@@ -20,11 +20,23 @@ function formatProduct(product) {
     category: product.category,
     image: product.image,
     isAvailable: product.isAvailable,
+    isDeleted: product.isDeleted,
     seller: product.seller,
     createdAt: product.createdAt,
     updatedAt: product.updatedAt,
   };
 }
+
+function extractPublicIdFromUrl(url) {
+  const parts = url.split("/");
+  const fileName = parts.pop().split(".")[0];
+  const folder =
+    parts[parts.length - 1] === "products"
+      ? "products"
+      : parts[parts.length - 2];
+  return `${folder}/${fileName}`;
+}
+
 const uploadToCloudinary = (buffer) => {
   return new Promise((resolve, reject) => {
     const stream = cloudinary.uploader.upload_stream(
@@ -111,6 +123,45 @@ const createProduct = asyncHandler(async (req, res) => {
   res.status(201).json(formatProduct(product));
 });
 
+const getSellerProducts = asyncHandler(async (req, res) => {
+  const sellerId = req.user._id;
+  const { includeDeleted, limit, page } = req.query;
+
+  const query = {
+    seller: sellerId,
+    isAvailable: true,
+    isDeleted: { $ne: true },
+  };
+
+  if (includeDeleted !== "true") {
+    query.isDeleted = { $ne: true };
+  } else {
+    query.isDeleted = true;
+  }
+
+  const currentPage = parseInt(page) || 1;
+  const itemsPerPage = parseInt(limit) || 10;
+
+  const [products, totalProducts] = await Promise.all([
+    Product.find(query)
+      .skip((currentPage - 1) * itemsPerPage)
+      .limit(itemsPerPage)
+      .sort({ createdAt: -1 })
+      .populate("seller", "name email createdAt")
+      .lean(),
+    Product.countDocuments(query),
+  ]);
+
+  const totalPages = Math.ceil(totalProducts / itemsPerPage);
+
+  res.status(200).json({
+    products: products.map(formatProduct),
+    currentPage,
+    totalPages,
+    totalProducts,
+  });
+});
+
 const updateProduct = asyncHandler(async (req, res) => {
   if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
     res.status(400);
@@ -125,9 +176,25 @@ const updateProduct = asyncHandler(async (req, res) => {
 
   const updatedFields = req.body;
 
+  const previousImage = product.image;
+
   if (req.file) {
     const uploadResult = await uploadToCloudinary(req.file.buffer);
     updatedFields.image = uploadResult.secure_url;
+
+    if (previousImage) {
+      const publicId = extractPublicIdFromUrl(previousImage);
+      await cloudinary.uploader.destroy(publicId);
+    }
+  }
+
+  if (updatedFields.image === "") {
+    updatedFields.image = null;
+
+    if (previousImage) {
+      const publicId = extractPublicIdFromUrl(previousImage);
+      await cloudinary.uploader.destroy(publicId);
+    }
   }
 
   Object.assign(product, updatedFields);
@@ -141,16 +208,21 @@ const deleteProduct = asyncHandler(async (req, res) => {
     res.status(400);
     throw new Error("Invalid product ID");
   }
+
   const product = await Product.findById(req.params.id);
   if (!product) {
     res.status(404);
     throw new Error("Product not found");
   }
-  await product.deleteOne();
-  res.status(200).json({ message: "Product removed" });
+
+  product.isDeleted = true;
+  product.isAvailable = false;
+
+  await product.save();
+
+  res.status(200).json({ message: "Product soft-deleted" });
 });
 
-// Get a product by ID
 const getProductById = asyncHandler(async (req, res) => {
   if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
     res.status(400);
@@ -197,4 +269,5 @@ module.exports = {
   updateProduct,
   deleteProduct,
   getRelatedProducts,
+  getSellerProducts,
 };

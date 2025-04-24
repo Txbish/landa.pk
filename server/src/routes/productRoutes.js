@@ -24,5 +24,5 @@ router
   .delete(authenticate, deleteProduct);
 
 router.get("/:id/related", getRelatedProducts);
-
+router.get("/seller", authenticate, getSellerProducts);
 module.exports = router;
