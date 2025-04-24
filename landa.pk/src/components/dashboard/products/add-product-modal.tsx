@@ -84,7 +84,8 @@ export function AddProductModal({
       if (imageFile) {
         const imageData = new FormData();
         imageData.append("file", imageFile);
-        imageData.append("upload_preset", "thrift_store");
+        imageData.append("upload_preset", "landa-pk");
+        imageData.append("cloud_name", "dfjzm5l27");
 
         const uploadResponse = await fetch(
           "https://api.cloudinary.com/v1_1/dfjzm5l27/image/upload",

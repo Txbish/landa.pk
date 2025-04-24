@@ -24,8 +24,6 @@ export default function DashboardLayout({
     }
   }, [loading, isLoggedIn, user]);
 
-  // Don't render anything on the server to avoid hydration issues
-  // Only render once we're on the client side
   if (!isClient) {
     return null;
   }
@@ -38,7 +36,6 @@ export default function DashboardLayout({
     );
   }
 
-  // If not logged in or not a seller, the useEffect will handle the redirect
   if (!isLoggedIn || user?.role !== "seller") {
     return null;
   }
