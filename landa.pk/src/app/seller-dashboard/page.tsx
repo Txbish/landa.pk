@@ -3,7 +3,7 @@
 import { useAuth } from "@/context/AuthContext";
 import { useEffect, useState } from "react";
 import { fetchUserOrders } from "@/services/orderService";
-import { fetchProducts } from "@/services/productService";
+import { fetchSellerProducts } from "@/services/productService";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DollarSign, Package, ShoppingBag } from "lucide-react";
 import Link from "next/link";
@@ -22,14 +22,15 @@ export default function DashboardPage() {
 
       try {
         const ordersData = await fetchUserOrders();
-        const productsData = await fetchProducts();
 
-        // Filter products by seller
-        const sellerProducts = productsData.products.filter(
-          (product) => product.seller._id === user._id
-        );
+        const productsData = await fetchSellerProducts({
+          page: 1,
+          limit: 1000,
+          includeDeleted: false,
+        });
 
-        // Filter orders that contain products from this seller
+        const sellerProducts = productsData.products;
+
         const sellerOrders = ordersData.orders.filter((order: Order) =>
           order.items.some((item) =>
             sellerProducts.some((product) => product._id === item.product._id)
@@ -136,7 +137,7 @@ export default function DashboardPage() {
 
       {/* Quick Links */}
       <div className="grid gap-4 md:grid-cols-2">
-        <Link href="/dashboard/products">
+        <Link href="/seller-dashboard/products">
           <Card className="hover:bg-gray-50">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
@@ -152,7 +153,7 @@ export default function DashboardPage() {
           </Card>
         </Link>
 
-        <Link href="/dashboard/orders">
+        <Link href="/seller-dashboard/orders">
           <Card className="hover:bg-gray-50">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
