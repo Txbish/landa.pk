@@ -17,9 +17,8 @@ export default function AboutPage() {
           <Image
             src="/logo.webp"
             alt="Landa Logo"
-            width={72}
-            height={72}
-            className="object-contain"
+            fill
+            className="object-contain rounded-full"
           />
         </div>
         <h1 className="text-4xl font-extrabold text-gray-800 mb-2">
