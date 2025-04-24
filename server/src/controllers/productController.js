@@ -1,11 +1,28 @@
 const asyncHandler = require("express-async-handler");
 const Product = require("../models/Product");
 const mongoose = require("mongoose");
+
+function formatProduct(product) {
+  if (!product) return null;
+  return {
+    _id: product._id.toString(),
+    title: product.title,
+    description: product.description,
+    price: product.price,
+    category: product.category,
+    image: product.image,
+    isAvailable: product.isAvailable,
+    seller: product.seller,
+    createdAt: product.createdAt,
+    updatedAt: product.updatedAt,
+  };
+}
+
 const getProducts = asyncHandler(async (req, res) => {
   const { category, minPrice, maxPrice, sortBy, order, search, limit, page } =
     req.query;
 
-  const query = {};
+  const query = { isAvailable: true }; // Only available products
   if (category) query.category = category;
   if (minPrice) query.price = { ...query.price, $gte: Number(minPrice) };
   if (maxPrice) query.price = { ...query.price, $lte: Number(maxPrice) };
@@ -14,30 +31,31 @@ const getProducts = asyncHandler(async (req, res) => {
   const sort = {};
   if (sortBy) sort[sortBy] = order === "desc" ? -1 : 1;
 
-  let productsQuery = Product.find(query)
-    .sort(sort)
-    .populate("seller", "name email");
-
   const currentPage = parseInt(page) || 1;
   const itemsPerPage = parseInt(limit) || 10;
 
-  productsQuery = productsQuery
+  const productsQuery = Product.find(query)
+    .sort(sort)
     .skip((currentPage - 1) * itemsPerPage)
-    .limit(itemsPerPage);
+    .limit(itemsPerPage)
+    .populate("seller", "name email createdAt")
+    .lean();
 
-  const totalProducts = await Product.countDocuments(query);
+  const [products, totalProducts] = await Promise.all([
+    productsQuery,
+    Product.countDocuments(query),
+  ]);
   const totalPages = Math.ceil(totalProducts / itemsPerPage);
 
-  const products = await productsQuery;
-
   res.status(200).json({
-    products,
+    products: products.map(formatProduct),
     currentPage,
     totalPages,
     totalProducts,
   });
 });
 
+// Create a new product
 const createProduct = asyncHandler(async (req, res) => {
   const { title, description, price, category, image, quantity, isAvailable } =
     req.body;
@@ -58,72 +76,82 @@ const createProduct = asyncHandler(async (req, res) => {
     seller: req.user._id,
   });
 
-  res.status(201).json(product);
+  // Populate seller for response
+  await product.populate("seller", "name email createdAt");
+  res.status(201).json(formatProduct(product));
 });
 
 // Update a product
 const updateProduct = asyncHandler(async (req, res) => {
+  if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+    res.status(400);
+    throw new Error("Invalid product ID");
+  }
   const product = await Product.findById(req.params.id);
-
   if (!product) {
     res.status(404);
     throw new Error("Product not found");
   }
 
-  const updates = req.body;
-  Object.assign(product, updates);
-
-  const updatedProduct = await product.save();
-  res.status(200).json(updatedProduct);
+  Object.assign(product, req.body);
+  await product.save();
+  await product.populate("seller", "name email createdAt");
+  res.status(200).json(formatProduct(product));
 });
 
 // Delete a product
 const deleteProduct = asyncHandler(async (req, res) => {
+  if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+    res.status(400);
+    throw new Error("Invalid product ID");
+  }
   const product = await Product.findById(req.params.id);
-
   if (!product) {
     res.status(404);
     throw new Error("Product not found");
   }
-
   await product.deleteOne();
   res.status(200).json({ message: "Product removed" });
 });
 
+// Get a product by ID
 const getProductById = asyncHandler(async (req, res) => {
   if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
     res.status(400);
     throw new Error("Invalid product ID");
   }
-  const product = await Product.findById(req.params.id).populate(
-    "seller",
-    "name email createdAt"
-  );
+  const product = await Product.findById(req.params.id)
+    .populate("seller", "name email createdAt")
+    .lean();
   if (!product) {
     res.status(404);
     throw new Error("Product not found");
   }
-  res.status(200).json(product);
+  res.status(200).json(formatProduct(product));
 });
 
 const getRelatedProducts = asyncHandler(async (req, res) => {
-  const product = await Product.findById(req.params.id);
-
+  if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+    res.status(400);
+    throw new Error("Invalid product ID");
+  }
+  const product = await Product.findById(req.params.id).lean();
   if (!product) {
     res.status(404);
     throw new Error("Product not found");
   }
 
   const limit = parseInt(req.query.limit) || 4;
-
   const relatedProducts = await Product.find({
     _id: { $ne: product._id },
     category: product.category,
+    isAvailable: true,
   })
     .limit(limit)
-    .populate("seller", "name email");
+    .populate("seller", "name email createdAt")
+    .lean();
 
-  res.status(200).json(relatedProducts);
+  res.status(200).json(relatedProducts.map(formatProduct));
 });
 
 module.exports = {

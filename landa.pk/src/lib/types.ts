@@ -37,6 +37,8 @@ export interface Product {
   image: string;
   seller: User;
   isAvailable: boolean;
+  createdAt:string;
+  updatedAt:string;
 }
 
 export interface PaginatedProductsResponse {
