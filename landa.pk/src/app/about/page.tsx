@@ -7,10 +7,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { MissionStatement } from "@/components/animatedmission";
+import Navbar from "@/components/Navbar";
 
 export default function AboutPage() {
   return (
     <div className="bg-landa-cream min-h-screen w-full">
+      <Navbar />
       <main className="max-w-3xl mx-auto px-6 py-16 space-y-12">
         {/* Logo + Heading */}
         <div className="flex flex-col items-center text-center gap-6">

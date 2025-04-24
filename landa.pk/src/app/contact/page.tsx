@@ -5,10 +5,12 @@ import { Mail, MapPin, Instagram, Facebook, Twitter } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import Navbar from "@/components/Navbar";
 
 export default function ContactPage() {
   return (
     <div className="bg-landa-cream min-h-screen w-full">
+      <Navbar />
       <main className="max-w-2xl mx-auto px-4 py-16 space-y-10">
         <div className="text-center space-y-4">
           <h1 className="text-4xl font-bold tracking-tight">Contact Us</h1>
