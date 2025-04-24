@@ -235,7 +235,7 @@ const updateProduct = asyncHandler(async (req, res) => {
       res.status(500);
       throw new Error("Failed to upload image to Cloudinary");
     }
-  } else if (updatedFields.image === "") {
+  } else if (!updatedFields.image || updatedFields.image === "") {
     console.log("Image field is empty. Removing image...");
     updatedFields.image = null;
 
