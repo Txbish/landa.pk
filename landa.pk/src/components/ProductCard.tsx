@@ -1,13 +1,37 @@
+import { useMemo } from "react";
 import { Product } from "@/lib/types";
 import { Badge } from "./ui/badge";
 import Image from "next/image";
-import Link from "next/link"; // Import Link
+import Link from "next/link";
+import { useCart } from "@/context/CartContext";
 
 interface ProductCardProps {
   product: Product;
 }
 
 const ProductCard = ({ product }: ProductCardProps) => {
+  const { cartItems, addToCart, removeFromCart } = useCart();
+
+  // Check if this product is already in the cart
+  const inCart = useMemo(
+    () => cartItems.some((item) => item.product._id === product._id),
+    [cartItems, product._id]
+  );
+
+  const handleAddToCart = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    await addToCart(product);
+  };
+
+  const handleRemoveFromCart = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    // Find the cart item id for this product
+    const cartItem = cartItems.find((item) => item.product._id === product._id);
+    if (cartItem) {
+      await removeFromCart(cartItem._id);
+    }
+  };
+
   return (
     <Link
       href={`/products/${product._id}`}
@@ -40,17 +64,31 @@ const ProductCard = ({ product }: ProductCardProps) => {
           <span className="font-display text-lg font-bold text-landa-orange">
             ${product.price.toFixed(2)}
           </span>
-          <button
-            disabled={!product.isAvailable}
-            className={`px-3 py-1.5 rounded ${
-              product.isAvailable
-                ? "bg-landa-green text-white hover:bg-landa-darkgreen"
-                : "bg-gray-200 text-gray-500 cursor-not-allowed"
-            } transition-colors`}
-            onClick={(e) => e.preventDefault()} // Prevent navigation on button click
-          >
-            {product.isAvailable ? "Add to Cart" : "Sold Out"}
-          </button>
+          {product.isAvailable && !inCart && (
+            <button
+              className="px-3 py-1.5 rounded bg-landa-green text-white hover:bg-landa-darkgreen transition-colors"
+              onClick={handleAddToCart}
+            >
+              Add to Cart
+            </button>
+          )}
+          {product.isAvailable && inCart && (
+            <button
+              className="px-3 py-1.5 rounded bg-red-500 text-white hover:bg-red-600 transition-colors"
+              onClick={handleRemoveFromCart}
+            >
+              Remove from Cart
+            </button>
+          )}
+          {!product.isAvailable && (
+            <button
+              disabled
+              className="px-3 py-1.5 rounded bg-gray-200 text-gray-500 cursor-not-allowed"
+              onClick={(e) => e.preventDefault()}
+            >
+              Sold Out
+            </button>
+          )}
         </div>
       </div>
     </Link>
