@@ -1,5 +1,3 @@
-"use client";
-
 import type React from "react";
 import { useState } from "react";
 import axios from "@/lib/axios";
@@ -72,45 +70,24 @@ export function AddProductModal({
     e.preventDefault();
     setLoading(true);
     try {
-      if (!imageFile && !imagePreview) {
+      if (!imageFile) {
         alert("Please select an image");
         setLoading(false);
         return;
       }
 
-      let imageUrl = undefined;
+      const data = new FormData();
+      data.append("title", formData.title);
+      data.append("description", formData.description);
+      data.append("price", formData.price);
+      data.append("category", formData.category);
+      data.append("isAvailable", "true");
+      data.append("image", imageFile);
 
-      // Upload image to Cloudinary
-      if (imageFile) {
-        const imageData = new FormData();
-        imageData.append("file", imageFile);
-        imageData.append("upload_preset", "landa-pk");
-        imageData.append("cloud_name", "dfjzm5l27");
+      const response = await axios.post("/products", data, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
 
-        const uploadResponse = await fetch(
-          "https://api.cloudinary.com/v1_1/dfjzm5l27/image/upload",
-          {
-            method: "POST",
-            body: imageData,
-          }
-        );
-
-        const uploadData = await uploadResponse.json();
-        imageUrl = uploadData.secure_url;
-      }
-
-      // Create product
-      const productData = {
-        title: formData.title,
-        description: formData.description,
-        price: Number.parseFloat(formData.price),
-        category: formData.category,
-        image: imageUrl,
-        seller: user?._id,
-        isAvailable: true,
-      };
-
-      const response = await axios.post("/products", productData);
       onAddProduct(response.data);
 
       // Reset form
@@ -145,6 +122,7 @@ export function AddProductModal({
               <Input
                 id="title"
                 name="title"
+                className="mt-2"
                 value={formData.title}
                 onChange={handleChange}
                 required
@@ -156,6 +134,7 @@ export function AddProductModal({
               <Textarea
                 id="description"
                 name="description"
+                className="mt-2"
                 value={formData.description}
                 onChange={handleChange}
                 rows={4}
@@ -171,6 +150,7 @@ export function AddProductModal({
                   type="number"
                   step="0.01"
                   min="0"
+                  className="mt-2"
                   value={formData.price}
                   onChange={handleChange}
                   required
@@ -185,7 +165,7 @@ export function AddProductModal({
                     setFormData({ ...formData, category: value })
                   }
                 >
-                  <SelectTrigger id="category">
+                  <SelectTrigger id="category" className="mt-2">
                     <SelectValue placeholder="Select category" />
                   </SelectTrigger>
                   <SelectContent>

@@ -153,9 +153,6 @@ export default function ProductsPage() {
               <p className="mb-4 text-lg font-medium text-gray-500">
                 No products found
               </p>
-              <Button onClick={() => setAddModalOpen(true)}>
-                <Plus className="mr-2 h-4 w-4" /> Add Your First Product
-              </Button>
             </div>
           ) : (
             <div className="overflow-x-auto">

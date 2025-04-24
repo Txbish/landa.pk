@@ -6,6 +6,7 @@ const morgan = require("morgan");
 const session = require("express-session");
 const cookieParser = require("cookie-parser");
 const MongoStore = require("connect-mongo");
+const path = require("path");
 
 const userRoutes = require("./routes/userRoutes");
 const orderRoutes = require("./routes/orderRoutes");
@@ -17,6 +18,7 @@ const { seedAdmin } = require("./utils/seed");
 dotenv.config();
 
 const app = express();
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // === Allowed Origins for CORS ===
 const allowedOrigins = [

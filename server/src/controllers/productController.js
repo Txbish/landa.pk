@@ -1,6 +1,13 @@
 const asyncHandler = require("express-async-handler");
 const Product = require("../models/Product");
 const mongoose = require("mongoose");
+const cloudinary = require("cloudinary").v2;
+
+cloudinary.config({
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 function formatProduct(product) {
   if (!product) return null;
@@ -55,12 +62,18 @@ const getProducts = asyncHandler(async (req, res) => {
   });
 });
 
-// Create a new product
 const createProduct = asyncHandler(async (req, res) => {
-  const { title, description, price, category, image, quantity, isAvailable } =
-    req.body;
+  const { title, description, price, category, isAvailable, image } = req.body;
+  let imageUrl = image;
 
-  if (!title || !price || !image) {
+  if (req.file) {
+    const uploadResult = await cloudinary.uploader.upload(req.file.path, {
+      folder: "products",
+    });
+    imageUrl = uploadResult.secure_url;
+  }
+
+  if (!title || !price || !imageUrl) {
     res.status(400);
     throw new Error("Title, price, and image are required");
   }
@@ -70,36 +83,42 @@ const createProduct = asyncHandler(async (req, res) => {
     description,
     price,
     category,
-    image,
-    quantity,
+    image: imageUrl,
     isAvailable,
     seller: req.user._id,
   });
 
-  // Populate seller for response
   await product.populate("seller", "name email createdAt");
   res.status(201).json(formatProduct(product));
 });
 
-// Update a product
 const updateProduct = asyncHandler(async (req, res) => {
   if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
     res.status(400);
     throw new Error("Invalid product ID");
   }
+
   const product = await Product.findById(req.params.id);
   if (!product) {
     res.status(404);
     throw new Error("Product not found");
   }
 
-  Object.assign(product, req.body);
+  const updatedFields = req.body;
+
+  if (req.file) {
+    const uploadResult = await cloudinary.uploader.upload(req.file.path, {
+      folder: "products",
+    });
+    updatedFields.image = uploadResult.secure_url;
+  }
+
+  Object.assign(product, updatedFields);
   await product.save();
   await product.populate("seller", "name email createdAt");
   res.status(200).json(formatProduct(product));
 });
 
-// Delete a product
 const deleteProduct = asyncHandler(async (req, res) => {
   if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
     res.status(400);

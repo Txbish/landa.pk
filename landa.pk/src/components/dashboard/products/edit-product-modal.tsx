@@ -59,6 +59,7 @@ export function EditProductModal({
         isAvailable: product.isAvailable,
       });
       setImagePreview(product.image);
+      setImageFile(null);
     }
   }, [product]);
 
@@ -79,46 +80,28 @@ export function EditProductModal({
 
   const removeImage = () => {
     setImageFile(null);
-    setImagePreview(product.image);
+    setImagePreview(null);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
 
     try {
-      setLoading(true);
-
-      let imageUrl = product.image;
-
-      // Upload new image if changed
+      const data = new FormData();
+      data.append("title", formData.title);
+      data.append("description", formData.description);
+      data.append("price", formData.price);
+      data.append("category", formData.category);
+      data.append("isAvailable", String(formData.isAvailable));
+      // Only append image if a new file is selected
       if (imageFile) {
-        const imageData = new FormData();
-        imageData.append("file", imageFile);
-        imageData.append("upload_preset", "thrift_store");
-
-        const uploadResponse = await fetch(
-          "https://api.cloudinary.com/v1_1/your-cloud-name/image/upload",
-          {
-            method: "POST",
-            body: imageData,
-          }
-        );
-
-        const uploadData = await uploadResponse.json();
-        imageUrl = uploadData.secure_url;
+        data.append("image", imageFile);
       }
 
-      // Update product
-      const productData = {
-        title: formData.title,
-        description: formData.description,
-        price: Number.parseFloat(formData.price),
-        category: formData.category,
-        image: imageUrl,
-        isAvailable: formData.isAvailable,
-      };
-
-      const response = await axios.put(`/products/${product._id}`, productData);
+      const response = await axios.put(`/products/${product._id}`, data, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
       onEditProduct(response.data);
       onClose();
     } catch (error) {
@@ -142,6 +125,7 @@ export function EditProductModal({
               <Input
                 id="title"
                 name="title"
+                className="mt-2"
                 value={formData.title}
                 onChange={handleChange}
                 required
@@ -153,6 +137,7 @@ export function EditProductModal({
               <Textarea
                 id="description"
                 name="description"
+                className="mt-2"
                 value={formData.description}
                 onChange={handleChange}
                 rows={4}
@@ -168,6 +153,7 @@ export function EditProductModal({
                   type="number"
                   step="0.01"
                   min="0"
+                  className="mt-2"
                   value={formData.price}
                   onChange={handleChange}
                   required
@@ -182,7 +168,7 @@ export function EditProductModal({
                     setFormData({ ...formData, category: value })
                   }
                 >
-                  <SelectTrigger id="category">
+                  <SelectTrigger id="category" className="mt-2">
                     <SelectValue placeholder="Select category" />
                   </SelectTrigger>
                   <SelectContent>
@@ -247,7 +233,7 @@ export function EditProductModal({
                   })
                 }
               >
-                <SelectTrigger id="isAvailable">
+                <SelectTrigger id="isAvailable" className="mt-2">
                   <SelectValue placeholder="Select availability" />
                 </SelectTrigger>
                 <SelectContent>
