@@ -125,8 +125,15 @@ const createProduct = asyncHandler(async (req, res) => {
 
 const getSellerProducts = asyncHandler(async (req, res) => {
   console.log("req.user:", req.user);
-  const sellerId = req.user._id;
+  const sellerId = req.user?._id;
+  if (!sellerId) {
+    console.error("Seller ID is missing in req.user");
+    res.status(400).json({ message: "Seller ID is required" });
+    return;
+  }
+
   const { includeDeleted, limit, page, search, sortBy, order } = req.query;
+  console.log("req.query:", req.query);
 
   const query = { seller: sellerId };
 
@@ -145,6 +152,8 @@ const getSellerProducts = asyncHandler(async (req, res) => {
     ];
   }
 
+  console.log("Constructed query:", query);
+
   const currentPage = parseInt(page) || 1;
   const itemsPerPage = parseInt(limit) || 10;
   const skip = (currentPage - 1) * itemsPerPage;
@@ -155,24 +164,29 @@ const getSellerProducts = asyncHandler(async (req, res) => {
   }
   sortOptions.createdAt = -1;
 
-  const [products, totalProducts] = await Promise.all([
-    Product.find(query)
-      .skip(skip)
-      .limit(itemsPerPage)
-      .sort(sortOptions)
-      .populate("seller", "name email createdAt")
-      .lean(),
-    Product.countDocuments(query),
-  ]);
+  try {
+    const [products, totalProducts] = await Promise.all([
+      Product.find(query)
+        .skip(skip)
+        .limit(itemsPerPage)
+        .sort(sortOptions)
+        .populate("seller", "name email createdAt")
+        .lean(),
+      Product.countDocuments(query),
+    ]);
 
-  const totalPages = Math.ceil(totalProducts / itemsPerPage);
+    const totalPages = Math.ceil(totalProducts / itemsPerPage);
 
-  res.status(200).json({
-    products: products.map(formatProduct),
-    currentPage,
-    totalPages,
-    totalProducts,
-  });
+    res.status(200).json({
+      products: products.map(formatProduct),
+      currentPage,
+      totalPages,
+      totalProducts,
+    });
+  } catch (error) {
+    console.error("Error fetching seller products:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
 });
 
 const updateProduct = asyncHandler(async (req, res) => {
