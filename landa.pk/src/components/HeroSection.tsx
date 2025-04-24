@@ -5,10 +5,10 @@ const HeroSection = () => {
     <div className="relative flex flex-col md:flex-row items-center overflow-hidden rounded-xl">
       {/* Left Side - Image */}
       <div className="md:w-1/2 relative z-10 p-4 md:p-6">
-        <div className="rounded-xl overflow-hidden shadow-xl border-4 border-white">
+        <div className="relative h-64 md:h-96 w-full rounded-xl overflow-hidden shadow-xl border-4 border-white">
           <Image
             fill
-            src="landa.pk/public/home.webp"
+            src="/home.webp"
             alt="Person shopping at thrift store"
             className="w-full h-full object-cover"
           />
