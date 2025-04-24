@@ -98,7 +98,7 @@ export default function Header() {
                 {user?.role === "admin" ? (
                   <>
                     <DropdownMenuItem asChild>
-                      <Link href="/admin-dashboard">Admin Dashboard</Link>
+                      <Link href="/admin">Admin Dashboard</Link>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={() => logout()}>
