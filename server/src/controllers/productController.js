@@ -2,6 +2,7 @@ const asyncHandler = require("express-async-handler");
 const Product = require("../models/Product");
 const mongoose = require("mongoose");
 const cloudinary = require("cloudinary").v2;
+const streamifier = require("streamifier");
 
 cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,
@@ -24,7 +25,18 @@ function formatProduct(product) {
     updatedAt: product.updatedAt,
   };
 }
-
+const uploadToCloudinary = (buffer) => {
+  return new Promise((resolve, reject) => {
+    const stream = cloudinary.uploader.upload_stream(
+      { folder: "products" },
+      (error, result) => {
+        if (error) reject(error);
+        else resolve(result);
+      }
+    );
+    streamifier.createReadStream(buffer).pipe(stream);
+  });
+};
 const getProducts = asyncHandler(async (req, res) => {
   const { category, minPrice, maxPrice, sortBy, order, search, limit, page } =
     req.query;
@@ -63,13 +75,11 @@ const getProducts = asyncHandler(async (req, res) => {
 });
 
 const createProduct = asyncHandler(async (req, res) => {
-  const { title, description, price, category, isAvailable, image } = req.body;
-  let imageUrl = image;
+  const { title, description, price, category, isAvailable } = req.body;
+  let imageUrl;
 
   if (req.file) {
-    const uploadResult = await cloudinary.uploader.upload(req.file.path, {
-      folder: "products",
-    });
+    const uploadResult = await uploadToCloudinary(req.file.buffer);
     imageUrl = uploadResult.secure_url;
   }
 
@@ -107,9 +117,7 @@ const updateProduct = asyncHandler(async (req, res) => {
   const updatedFields = req.body;
 
   if (req.file) {
-    const uploadResult = await cloudinary.uploader.upload(req.file.path, {
-      folder: "products",
-    });
+    const uploadResult = await uploadToCloudinary(req.file.buffer);
     updatedFields.image = uploadResult.secure_url;
   }
 
