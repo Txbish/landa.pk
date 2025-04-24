@@ -69,7 +69,7 @@ export default function LoginPage() {
     try {
       const user = await login(formData.email, formData.password);
       toast.success("Login successful!");
-      router.push("/dashboard");
+      router.push("/");
     } catch (err: any) {
       if (err.message?.toLowerCase().includes("invalid")) {
         toast.error("Incorrect credentials. Please try again.");

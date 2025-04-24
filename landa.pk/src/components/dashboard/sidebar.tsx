@@ -3,23 +3,16 @@
 import { useAuth } from "@/context/AuthContext";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-  LayoutDashboard,
-  Package,
-  ShoppingBag,
-  Settings,
-  LogOut,
-} from "lucide-react";
+import { LayoutDashboard, Package, ShoppingBag, Home } from "lucide-react";
 
 export function Sidebar() {
   const { logout } = useAuth();
   const pathname = usePathname();
 
   const links = [
-    { href: "/dashboard", label: "Overview", icon: LayoutDashboard },
-    { href: "/dashboard/products", label: "Products", icon: Package },
-    { href: "/dashboard/orders", label: "Orders", icon: ShoppingBag },
-    { href: "/dashboard/settings", label: "Settings", icon: Settings },
+    { href: "/seller-dashboard", label: "Overview", icon: LayoutDashboard },
+    { href: "/seller-dashboard/products", label: "Products", icon: Package },
+    { href: "/seller-dashboard/orders", label: "Orders", icon: ShoppingBag },
   ];
 
   return (
@@ -56,13 +49,12 @@ export function Sidebar() {
           })}
         </nav>
         <div className="border-t border-gray-200 p-4">
-          <button
-            onClick={() => logout()}
-            className="flex w-full items-center rounded-md px-2 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-          >
-            <LogOut className="mr-3 h-5 w-5 text-gray-400" />
-            Sign out
-          </button>
+          <Link href="/">
+            <button className="flex w-full items-center rounded-md px-2 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900">
+              <Home className="mr-3 h-5 w-5 text-gray-400" />
+              Home
+            </button>
+          </Link>
         </div>
       </div>
     </div>
