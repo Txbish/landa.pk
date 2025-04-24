@@ -10,6 +10,7 @@ const {
   updateProduct,
   deleteProduct,
   getRelatedProducts,
+  getSellerProducts,
 } = require("../controllers/productController");
 
 router
