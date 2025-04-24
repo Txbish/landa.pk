@@ -37,6 +37,7 @@ export interface Product {
   image: string;
   seller: User;
   isAvailable: boolean;
+  isDeleted:boolean;
   createdAt:string;
   updatedAt:string;
 }
