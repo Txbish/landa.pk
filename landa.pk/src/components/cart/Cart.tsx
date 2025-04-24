@@ -106,7 +106,7 @@ export function Cart() {
                       <div className="flex justify-between items-end mt-auto">
                         <div className="text-sm">Qty: 1</div>
                         <div className="font-medium">
-                          Rs. {item.product.price.toFixed(2)}
+                          ${item.product.price.toFixed(2)}
                         </div>
                       </div>
                     </div>
@@ -117,11 +117,11 @@ export function Cart() {
             <div className="p-4 border-t">
               <div className="flex justify-between py-2">
                 <span>Subtotal</span>
-                <span className="font-medium">Rs. {totalAmount}</span>
+                <span className="font-medium">${totalAmount.toFixed(2)}</span>
               </div>
               <div className="flex justify-between py-2 text-lg font-semibold">
                 <span>Total</span>
-                <span>Rs. {totalAmount}</span>
+                <span>${totalAmount.toFixed(2)}</span>
               </div>
               <Link href="/checkout" onClick={closeCart}>
                 <Button className="w-full mt-4">Proceed to Checkout</Button>
