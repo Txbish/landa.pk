@@ -236,20 +236,20 @@ const deleteProduct = asyncHandler(async (req, res) => {
   res.status(200).json({ message: "Product soft-deleted" });
 });
 
-const getProductById = asyncHandler(async (req, res) => {
-  if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
-    res.status(400);
-    throw new Error("Invalid product ID");
-  }
-  const product = await Product.findById(req.params.id)
-    .populate("seller", "name email createdAt")
-    .lean();
-  if (!product) {
-    res.status(404);
-    throw new Error("Product not found");
-  }
-  res.status(200).json(formatProduct(product));
-});
+// const getProductById = asyncHandler(async (req, res) => {
+//   if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+//     res.status(400);
+//     throw new Error("Invalid product ID");
+//   }
+//   const product = await Product.findById(req.params.id)
+//     .populate("seller", "name email createdAt")
+//     .lean();
+//   if (!product) {
+//     res.status(404);
+//     throw new Error("Product not found");
+//   }
+//   res.status(200).json(formatProduct(product));
+// });
 
 const getRelatedProducts = asyncHandler(async (req, res) => {
   if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
@@ -277,7 +277,7 @@ const getRelatedProducts = asyncHandler(async (req, res) => {
 
 module.exports = {
   getProducts,
-  getProductById,
+  // getProductById,
   createProduct,
   updateProduct,
   deleteProduct,

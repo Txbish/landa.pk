@@ -5,7 +5,7 @@ const upload = require("../middleware/upload");
 
 const {
   getProducts,
-  getProductById,
+  // getProductById,
   createProduct,
   updateProduct,
   deleteProduct,
@@ -20,7 +20,7 @@ router
 
 router
   .route("/:id")
-  .get(getProductById)
+  // .get(getProductById)
   .put(authenticate, upload.single("image"), updateProduct)
   .delete(authenticate, deleteProduct);
 
