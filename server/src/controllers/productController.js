@@ -213,15 +213,15 @@ const updateProduct = asyncHandler(async (req, res) => {
       const publicId = extractPublicIdFromUrl(previousImage);
       await cloudinary.uploader.destroy(publicId);
     }
-  }
-
-  if (updatedFields.image === "") {
+  } else if (updatedFields.image === "") {
     updatedFields.image = null;
 
     if (previousImage) {
       const publicId = extractPublicIdFromUrl(previousImage);
       await cloudinary.uploader.destroy(publicId);
     }
+  } else {
+    delete updatedFields.image;
   }
 
   Object.assign(product, updatedFields);

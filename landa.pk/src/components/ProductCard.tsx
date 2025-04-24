@@ -12,7 +12,6 @@ interface ProductCardProps {
 const ProductCard = ({ product }: ProductCardProps) => {
   const { cartItems, addToCart, removeFromCart } = useCart();
 
-  // Check if this product is already in the cart
   const inCart = useMemo(
     () => cartItems.some((item) => item.product._id === product._id),
     [cartItems, product._id]
@@ -25,7 +24,6 @@ const ProductCard = ({ product }: ProductCardProps) => {
 
   const handleRemoveFromCart = async (e: React.MouseEvent) => {
     e.preventDefault();
-    // Find the cart item id for this product
     const cartItem = cartItems.find((item) => item.product._id === product._id);
     if (cartItem) {
       await removeFromCart(cartItem._id);
