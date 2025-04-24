@@ -1,60 +1,89 @@
+"use client";
+
 import Link from "next/link";
+import { Mail, MapPin, Instagram, Facebook, Twitter } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
 
 export default function ContactPage() {
   return (
-    <main className="max-w-xl mx-auto px-4 py-12">
-      <div className="flex flex-col items-center text-center gap-6">
-        <h1 className="text-3xl font-bold mb-2">Contact Us</h1>
-        <p className="text-gray-700 text-lg">
-          Have a question, suggestion, or want to get in touch? We’d love to
-          hear from you!
+    <main className="max-w-2xl mx-auto px-4 py-16 space-y-10">
+      <div className="text-center space-y-4">
+        <h1 className="text-4xl font-bold tracking-tight">Contact Us</h1>
+        <p className="text-muted-foreground text-lg">
+          Got questions, suggestions, or just want to say hi? We're here for
+          you.
         </p>
-        <div className="w-full flex flex-col gap-4 mt-4">
-          <div className="bg-gray-50 rounded-lg p-4 shadow-sm">
-            <h2 className="font-semibold mb-1">Email</h2>
+      </div>
+
+      <div className="grid gap-6">
+        {/* Email Card */}
+        <Card>
+          <CardHeader className="flex flex-row items-center gap-4">
+            <Mail className="text-landa-green" />
+            <CardTitle>Email</CardTitle>
+          </CardHeader>
+          <CardContent>
             <a
               href="mailto:info@landa.pk"
-              className="text-landa-green underline"
+              className="text-landa-green underline text-sm"
             >
               info@landa.pk
             </a>
-          </div>
-          <div className="bg-gray-50 rounded-lg p-4 shadow-sm">
-            <h2 className="font-semibold mb-1">Location</h2>
-            <p className="text-gray-700">Islamabad, Pakistan</p>
-          </div>
+          </CardContent>
+        </Card>
+
+        {/* Location Card */}
+        <Card>
+          <CardHeader className="flex flex-row items-center gap-4">
+            <MapPin className="text-landa-green" />
+            <CardTitle>Location</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-muted-foreground">Islamabad, Pakistan</p>
+          </CardContent>
+        </Card>
+      </div>
+
+      <Separator className="my-6" />
+
+      {/* Social Media */}
+      <div className="text-center space-y-4">
+        <p className="text-muted-foreground">
+          Connect with us on social media:
+        </p>
+        <div className="flex justify-center gap-4">
+          <a
+            href="#"
+            aria-label="Instagram"
+            className="hover:text-landa-green transition-colors"
+          >
+            <Instagram />
+          </a>
+          <a
+            href="#"
+            aria-label="Facebook"
+            className="hover:text-landa-green transition-colors"
+          >
+            <Facebook />
+          </a>
+          <a
+            href="#"
+            aria-label="Twitter"
+            className="hover:text-landa-green transition-colors"
+          >
+            <Twitter />
+          </a>
         </div>
-        <div className="w-full border-t my-8"></div>
-        <div className="flex flex-col items-center gap-2">
-          <p className="text-gray-600">Or reach out to us on social media:</p>
-          <div className="flex gap-4 justify-center">
-            <a
-              href="#"
-              className="text-landa-green hover:underline"
-              aria-label="Instagram"
-            >
-              Instagram
-            </a>
-            <a
-              href="#"
-              className="text-landa-green hover:underline"
-              aria-label="Facebook"
-            >
-              Facebook
-            </a>
-            <a
-              href="#"
-              className="text-landa-green hover:underline"
-              aria-label="Twitter"
-            >
-              Twitter
-            </a>
-          </div>
-        </div>
+      </div>
+
+      {/* CTA Button */}
+      <div className="text-center pt-8">
         <Link href="/products">
-          <button className="mt-8 bg-landa-green hover:bg-landa-darkgreen text-white font-semibold px-6 py-2 rounded transition">
+          <Button className="bg-landa-green hover:bg-landa-darkgreen text-white px-6 py-2 text-sm font-medium rounded-md">
             Shop Now
-          </button>
+          </Button>
         </Link>
       </div>
     </main>
