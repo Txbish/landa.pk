@@ -15,7 +15,7 @@ export default function AboutPage() {
       <div className="flex flex-col items-center text-center gap-6">
         <div className="w-28 h-28 rounded-full bg-muted flex items-center justify-center shadow-lg">
           <Image
-            src="/logo.png"
+            src="/logo.webp"
             alt="Landa Logo"
             width={72}
             height={72}
