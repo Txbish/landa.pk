@@ -84,7 +84,7 @@ export default function ContactPage() {
         {/* CTA Button */}
         <div className="text-center pt-8">
           <Link href="/products">
-            <Button className="bg-landa-green hover:bg-landa-darkgreen text-white px-6 py-2 text-sm font-medium rounded-md">
+            <Button className="bg-landa-green bg-whi hover:bg-landa-darkgreen text-white px-6 py-2 text-sm font-medium rounded-md">
               Shop Now
             </Button>
           </Link>

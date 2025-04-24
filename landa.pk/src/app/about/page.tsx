@@ -14,12 +14,12 @@ export default function AboutPage() {
       <main className="max-w-3xl mx-auto px-6 py-16 space-y-12">
         {/* Logo + Heading */}
         <div className="flex flex-col items-center text-center gap-6">
-          <div className="w-28 h-28 rounded-full bg-muted flex items-center justify-center shadow-lg">
+          <div className="w-28 h-28 rounded-full bg-muted flex items-center justify-center shadow-lg relative overflow-hidden">
             <Image
               src="/logo.webp"
               alt="Landa Logo"
               fill
-              className="object-contain rounded-full"
+              className="object-cover rounded-full"
             />
           </div>
           <h1 className="text-4xl font-extrabold text-gray-800 mb-2">
