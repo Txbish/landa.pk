@@ -190,42 +190,74 @@ const getSellerProducts = asyncHandler(async (req, res) => {
 });
 
 const updateProduct = asyncHandler(async (req, res) => {
+  console.log("Update product request received. Params:", req.params);
+  console.log("Request body:", req.body);
+
   if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+    console.error("Invalid product ID:", req.params.id);
     res.status(400);
     throw new Error("Invalid product ID");
   }
 
   const product = await Product.findById(req.params.id);
   if (!product) {
+    console.error("Product not found for ID:", req.params.id);
     res.status(404);
     throw new Error("Product not found");
   }
 
   const updatedFields = req.body;
+  console.log("Updated fields before processing image:", updatedFields);
 
   const previousImage = product.image;
+  console.log("Previous image URL:", previousImage);
 
   if (req.file) {
-    const uploadResult = await uploadToCloudinary(req.file.buffer);
-    updatedFields.image = uploadResult.secure_url;
+    try {
+      console.log("File uploaded. Processing Cloudinary upload...");
+      const uploadResult = await uploadToCloudinary(req.file.buffer);
+      updatedFields.image = uploadResult.secure_url;
+      console.log(
+        "New image uploaded to Cloudinary. URL:",
+        updatedFields.image
+      );
 
-    if (previousImage) {
-      const publicId = extractPublicIdFromUrl(previousImage);
-      await cloudinary.uploader.destroy(publicId);
+      if (previousImage) {
+        const publicId = extractPublicIdFromUrl(previousImage);
+        console.log(
+          "Deleting previous image from Cloudinary. Public ID:",
+          publicId
+        );
+        await cloudinary.uploader.destroy(publicId);
+      }
+    } catch (error) {
+      console.error("Error uploading new image to Cloudinary:", error);
+      res.status(500);
+      throw new Error("Failed to upload image to Cloudinary");
     }
   } else if (updatedFields.image === "") {
+    console.log("Image field is empty. Removing image...");
     updatedFields.image = null;
 
     if (previousImage) {
       const publicId = extractPublicIdFromUrl(previousImage);
+      console.log(
+        "Deleting previous image from Cloudinary. Public ID:",
+        publicId
+      );
       await cloudinary.uploader.destroy(publicId);
     }
   } else {
+    console.log("No new image provided. Keeping existing image.");
     delete updatedFields.image;
   }
 
+  console.log("Final updated fields:", updatedFields);
+
   Object.assign(product, updatedFields);
   await product.save();
+  console.log("Product updated successfully. ID:", product._id);
+
   await product.populate("seller", "name email createdAt");
   res.status(200).json(formatProduct(product));
 });
