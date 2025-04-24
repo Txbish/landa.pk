@@ -125,7 +125,7 @@ const createProduct = asyncHandler(async (req, res) => {
 
 const getSellerProducts = asyncHandler(async (req, res) => {
   const sellerId = req.user._id;
-  const { includeDeleted, limit, page } = req.query;
+  const { includeDeleted, limit, page, search, sortBy, sortOrder } = req.query;
 
   const query = {
     seller: sellerId,
@@ -133,20 +133,33 @@ const getSellerProducts = asyncHandler(async (req, res) => {
     isDeleted: { $ne: true },
   };
 
-  if (includeDeleted !== "true") {
-    query.isDeleted = { $ne: true };
-  } else {
+  if (includeDeleted === "true") {
     query.isDeleted = true;
+  }
+
+  if (search) {
+    query.$or = [
+      { title: { $regex: search, $options: "i" } },
+      { description: { $regex: search, $options: "i" } },
+      { category: { $regex: search, $options: "i" } },
+    ];
   }
 
   const currentPage = parseInt(page) || 1;
   const itemsPerPage = parseInt(limit) || 10;
+  const skip = (currentPage - 1) * itemsPerPage;
+
+  const sortOptions = {};
+  if (sortBy && sortOrder) {
+    sortOptions[sortBy] = sortOrder === "asc" ? 1 : -1;
+    sortOptions.createdAt = -1;
+  }
 
   const [products, totalProducts] = await Promise.all([
     Product.find(query)
-      .skip((currentPage - 1) * itemsPerPage)
+      .skip(skip)
       .limit(itemsPerPage)
-      .sort({ createdAt: -1 })
+      .sort(sortOptions)
       .populate("seller", "name email createdAt")
       .lean(),
     Product.countDocuments(query),

@@ -21,12 +21,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { Plus, Edit, Trash, Search, AlertTriangle } from "lucide-react";
+import { Plus, Edit, Trash, Search } from "lucide-react";
 import Image from "next/image";
 import { AddProductModal } from "@/components/dashboard/products/add-product-modal";
 import { EditProductModal } from "@/components/dashboard/products/edit-product-modal";
 import { DeleteProductModal } from "@/components/dashboard/products/delete-product-modal";
 import type { Product } from "@/lib/types";
+import { useDebouncedCallback } from "use-debounce";
 
 export default function ProductsPage() {
   const { user } = useAuth();
@@ -40,13 +41,22 @@ export default function ProductsPage() {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [includeDeleted, setIncludeDeleted] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1); // Current page
+  const [itemsPerPage] = useState(10); // Items per page
+
+  const debouncedSearch = useDebouncedCallback((value: string) => {
+    setSearchTerm(value);
+  }, 500); // Delay of 500ms before updating the state
 
   useEffect(() => {
     const loadProducts = async () => {
       try {
         setLoading(true);
 
+        // Send pagination and filter parameters to the backend
         const data = await fetchSellerProducts({
+          page: currentPage,
+          limit: itemsPerPage,
           sortBy,
           order: sortOrder,
           search: searchTerm || undefined,
@@ -68,7 +78,7 @@ export default function ProductsPage() {
     if (user) {
       loadProducts();
     }
-  }, [user, sortBy, sortOrder, searchTerm]);
+  }, [user, sortBy, sortOrder, searchTerm, includeDeleted, currentPage]);
 
   const handleAddProduct = (newProduct: Product) => {
     setProducts([newProduct, ...products]);
@@ -86,7 +96,6 @@ export default function ProductsPage() {
     setProducts(products.filter((product) => product._id !== deletedProductId));
   };
 
-  // Filter products based on search term
   const filteredProducts = products.filter(
     (product) =>
       product.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -95,6 +104,16 @@ export default function ProductsPage() {
       (product.category &&
         product.category.toLowerCase().includes(searchTerm.toLowerCase()))
   );
+
+  // Pagination logic
+  const indexOfLastProduct = currentPage * itemsPerPage;
+  const indexOfFirstProduct = indexOfLastProduct - itemsPerPage;
+  const currentProducts = filteredProducts.slice(
+    indexOfFirstProduct,
+    indexOfLastProduct
+  );
+
+  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
 
   return (
     <div className="space-y-6">
@@ -122,7 +141,7 @@ export default function ProductsPage() {
                 placeholder="Search products..."
                 className="pl-8"
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={(e) => debouncedSearch(e.target.value)}
               />
             </div>
             <div className="flex items-center space-x-4">
@@ -158,7 +177,7 @@ export default function ProductsPage() {
             <div className="flex h-64 items-center justify-center">
               <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-t-2 border-gray-900"></div>
             </div>
-          ) : filteredProducts.length === 0 ? (
+          ) : currentProducts.length === 0 ? (
             <div className="flex h-64 flex-col items-center justify-center">
               <p className="mb-4 text-lg font-medium text-gray-500">
                 No products found
@@ -178,7 +197,7 @@ export default function ProductsPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredProducts.map((product) => (
+                  {currentProducts.map((product) => (
                     <TableRow key={product._id}>
                       <TableCell>
                         <div className="relative h-12 w-12 overflow-hidden rounded-md">
@@ -238,6 +257,26 @@ export default function ProductsPage() {
               </Table>
             </div>
           )}
+
+          <div className="flex items-center justify-between mt-6">
+            <Button
+              variant="outline"
+              disabled={currentPage === 1}
+              onClick={() => setCurrentPage(currentPage - 1)}
+            >
+              Previous
+            </Button>
+            <span className="text-sm">
+              Page {currentPage} of {totalPages}
+            </span>
+            <Button
+              variant="outline"
+              disabled={currentPage === totalPages}
+              onClick={() => setCurrentPage(currentPage + 1)}
+            >
+              Next
+            </Button>
+          </div>
         </div>
       </Card>
 
