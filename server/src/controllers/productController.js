@@ -127,14 +127,13 @@ const getSellerProducts = asyncHandler(async (req, res) => {
   const sellerId = req.user._id;
   const { includeDeleted, limit, page, search, sortBy, sortOrder } = req.query;
 
-  const query = {
-    seller: sellerId,
-    isAvailable: true,
-    isDeleted: { $ne: true },
-  };
+  const query = { seller: sellerId };
 
   if (includeDeleted === "true") {
     query.isDeleted = true;
+  } else {
+    query.isDeleted = { $ne: true };
+    query.isAvailable = true;
   }
 
   if (search) {
@@ -152,8 +151,8 @@ const getSellerProducts = asyncHandler(async (req, res) => {
   const sortOptions = {};
   if (sortBy && sortOrder) {
     sortOptions[sortBy] = sortOrder === "asc" ? 1 : -1;
-    sortOptions.createdAt = -1;
   }
+  sortOptions.createdAt = -1;
 
   const [products, totalProducts] = await Promise.all([
     Product.find(query)
