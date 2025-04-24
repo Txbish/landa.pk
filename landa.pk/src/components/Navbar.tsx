@@ -36,7 +36,7 @@ export default function Header() {
               Home
             </Link>
             <Link
-              href="/shop"
+              href="/products"
               className={`text-sm font-medium transition-colors hover:text-primary ${
                 pathname === "/shop" ? "text-primary" : "text-muted-foreground"
               }`}
