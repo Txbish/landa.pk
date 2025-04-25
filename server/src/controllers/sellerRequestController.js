@@ -45,6 +45,8 @@ const createSellerRequest = asyncHandler(async (req, res) => {
   res.status(201).json(sellerRequest);
 });
 
+const User = require("../models/User"); // <-- import the User model
+
 const handleSellerRequest = asyncHandler(async (req, res) => {
   const { status } = req.body;
 
@@ -56,6 +58,20 @@ const handleSellerRequest = asyncHandler(async (req, res) => {
 
   sellerRequest.status = status;
   const updatedRequest = await sellerRequest.save();
+
+  const user = await User.findById(sellerRequest.user);
+  if (!user) {
+    res.status(404);
+    throw new Error("User not found");
+  }
+
+  if (status === "Approved") {
+    user.role = "seller";
+  } else if (status === "Rejected") {
+    user.role = "user";
+  }
+
+  await user.save();
 
   res.status(200).json(updatedRequest);
 });

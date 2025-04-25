@@ -132,7 +132,7 @@ export default function Header() {
                   Login
                 </Button>
               </Link>
-              <Link href="/register">
+              <Link href="/signup">
                 <Button variant="default" size="sm">
                   Register
                 </Button>
