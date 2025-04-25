@@ -1,5 +1,5 @@
 "use client";
-
+import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
 import {
@@ -142,7 +142,9 @@ export default function SellerRequestPage() {
               You already have seller privileges. You can manage your products
               and orders from the seller dashboard.
             </p>
-            <Button className="mt-6">Go to Seller Dashboard</Button>
+            <Link href="/seller-dashboard">
+              <Button className="mt-6">Go to Seller Dashboard</Button>
+            </Link>
           </CardContent>
         </Card>
       </div>
