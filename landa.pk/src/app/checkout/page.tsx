@@ -76,7 +76,7 @@ export default function CheckoutPage() {
       await clearCart();
 
       toast.success("Order placed successfully!");
-      router.push("/orders");
+      router.push("/");
     } catch (error) {
       console.error("Failed to place order:", error);
       toast.error("Failed to place order. Please try again.");
