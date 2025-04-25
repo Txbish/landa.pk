@@ -13,6 +13,9 @@ const {
   getSellerProducts,
 } = require("../controllers/productController");
 
+router.get("/seller", authenticate, getSellerProducts);
+router.get("/:id/related", getRelatedProducts);
+
 router
   .route("/")
   .get(getProducts)
@@ -24,6 +27,4 @@ router
   .put(authenticate, upload.single("image"), updateProduct)
   .delete(authenticate, deleteProduct);
 
-router.get("/:id/related", getRelatedProducts);
-router.get("/seller", authenticate, getSellerProducts);
 module.exports = router;
