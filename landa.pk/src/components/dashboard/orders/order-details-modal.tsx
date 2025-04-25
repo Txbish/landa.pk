@@ -15,7 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import type { Order, Product } from "@/lib/types";
+import type { Order } from "@/lib/types";
 import { updateItemStatus, updateOrderStatus } from "@/services/orderService";
 import Image from "next/image";
 
@@ -23,7 +23,6 @@ interface OrderDetailsModalProps {
   open: boolean;
   onClose: () => void;
   order: Order;
-  sellerProducts: Product[];
   onOrderUpdate: (order: Order) => void;
 }
 
@@ -31,15 +30,9 @@ export function OrderDetailsModal({
   open,
   onClose,
   order,
-  sellerProducts,
   onOrderUpdate,
 }: OrderDetailsModalProps) {
   const [loading, setLoading] = useState(false);
-
-  // Filter order items to only include products from this seller
-  const sellerItems = order.items.filter((item) =>
-    sellerProducts.some((product) => product._id === item.product._id)
-  );
 
   const handleUpdateItemStatus = async (
     itemId: string,
@@ -117,54 +110,47 @@ export function OrderDetailsModal({
           <div>
             <h3 className="mb-4 font-semibold">Items</h3>
             <div className="space-y-4">
-              {sellerItems.map((item) => {
-                const product = sellerProducts.find(
-                  (p) => p._id === item.product._id
-                );
-                if (!product) return null;
-
-                return (
-                  <div
-                    key={item._id}
-                    className="flex items-center justify-between rounded-lg border p-4"
-                  >
-                    <div className="flex items-center space-x-4">
-                      <div className="relative h-16 w-16 overflow-hidden rounded-md">
-                        <Image
-                          src={product.image || "/placeholder.svg"}
-                          alt={product.title}
-                          fill
-                          className="object-cover"
-                        />
-                      </div>
-                      <div>
-                        <h4 className="font-medium">{product.title}</h4>
-                        <p className="text-sm text-gray-500">
-                          ${product.price.toFixed(2)}
-                        </p>
-                      </div>
+              {order.items.map((item) => (
+                <div
+                  key={item._id}
+                  className="flex items-center justify-between rounded-lg border p-4"
+                >
+                  <div className="flex items-center space-x-4">
+                    <div className="relative h-16 w-16 overflow-hidden rounded-md">
+                      <Image
+                        src={item.product.image || "/placeholder.svg"}
+                        alt={item.product.title}
+                        fill
+                        className="object-cover"
+                      />
                     </div>
-                    <div className="flex items-center space-x-4">
-                      <Select
-                        value={item.itemStatus}
-                        onValueChange={(
-                          value: "Pending" | "Cancelled" | "Completed"
-                        ) => handleUpdateItemStatus(item._id, value)}
-                        disabled={loading}
-                      >
-                        <SelectTrigger className="w-[140px]">
-                          <SelectValue placeholder="Status" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="Pending">Pending</SelectItem>
-                          <SelectItem value="Completed">Completed</SelectItem>
-                          <SelectItem value="Cancelled">Cancelled</SelectItem>
-                        </SelectContent>
-                      </Select>
+                    <div>
+                      <h4 className="font-medium">{item.product.title}</h4>
+                      <p className="text-sm text-gray-500">
+                        ${item.product.price.toFixed(2)}
+                      </p>
                     </div>
                   </div>
-                );
-              })}
+                  <div className="flex items-center space-x-4">
+                    <Select
+                      value={item.itemStatus}
+                      onValueChange={(
+                        value: "Pending" | "Cancelled" | "Completed"
+                      ) => handleUpdateItemStatus(item._id, value)}
+                      disabled={loading}
+                    >
+                      <SelectTrigger className="w-[140px]">
+                        <SelectValue placeholder="Status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Pending">Pending</SelectItem>
+                        <SelectItem value="Completed">Completed</SelectItem>
+                        <SelectItem value="Cancelled">Cancelled</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
 

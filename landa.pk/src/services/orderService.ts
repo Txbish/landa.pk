@@ -8,24 +8,26 @@ export const fetchUserOrders = async () => {
   const response = await axiosInstance.get("/orders/userOrder");
   return response.data;
 };
+
+export const fetchSellerOrders = async () => {
+  const response = await axiosInstance.get("/orders/sellerOrder");
+  return response.data;
+};  
 export const fetchOrderById = async (orderId: string) => {
   const response = await axiosInstance.get(`/orders/${orderId}`);
   return response.data; 
 };
 
-// Create a new order
 export const createOrder = async (orderData: CreateOrderPayload) => {
   const response = await axiosInstance.post("/orders", orderData);
-  return response.data; // Returns the created order
+  return response.data; 
 };
 
-// Update the overall status of an order
 export const updateOrderStatus = async (orderId: string, status: "Pending" | "Cancelled" | "Completed") => {
   const response = await axiosInstance.put(`/orders/${orderId}`, { status });
-  return response.data; // Returns the updated order
+  return response.data; 
 };
 
-// Update the status of a specific item in an order
 export const updateItemStatus = async (
   orderId: string,
   itemId: string,

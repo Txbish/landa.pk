@@ -8,18 +8,17 @@ const {
   createOrder,
   updateOrderStatus,
   updateItemStatus,
+  getSellerOrders,
 } = require("../controllers/orderController");
 
-router.get("/", authenticate, admin, getAllOrders);
-
-router.post("/", authenticate, createOrder);
-
 router.get("/userOrder", authenticate, getUserOrders);
-
-router.get("/:id", authenticate, getOrderById);
-
-router.put("/:id", authenticate, updateOrderStatus);
+router.get("/sellerOrder", authenticate, getSellerOrders);
 
 router.put("/:id/item", authenticate, updateItemStatus);
+
+router.get("/", authenticate, admin, getAllOrders);
+router.post("/", authenticate, createOrder);
+router.get("/:id", authenticate, getOrderById);
+router.put("/:id", authenticate, updateOrderStatus);
 
 module.exports = router;

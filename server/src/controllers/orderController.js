@@ -2,14 +2,45 @@ const asyncHandler = require("express-async-handler");
 const Order = require("../models/Order");
 const Product = require("../models/Product");
 const User = require("../models/User");
-// Get all orders by logged-in user
 const getUserOrders = asyncHandler(async (req, res) => {
   const userId = req.user._id;
   const orders = await Order.find({ user: userId }).populate("items.product");
   res.status(200).json({ orders });
 });
+const getSellerOrders = asyncHandler(async (req, res) => {
+  const sellerId = req.user._id;
 
-// Admin or seller: get all orders
+  const orders = await Order.find({ "items.seller": sellerId })
+    .populate("user", "name email")
+    .populate("items.product", "title price")
+    .populate("items.seller", "name email");
+
+  const sellerOrders = orders.map((order) => {
+    const sellerItems = order.items.filter((item) =>
+      item.seller.equals(sellerId)
+    );
+
+    return {
+      _id: order._id,
+      user: order.user,
+      shippingAddress: order.shippingAddress,
+      contactName: order.contactName,
+      contactEmail: order.contactEmail,
+      contactPhone: order.contactPhone,
+      additionalNotes: order.additionalNotes,
+      totalAmount: sellerItems.reduce(
+        (sum, item) => sum + item.product.price,
+        0
+      ),
+      items: sellerItems,
+      overallStatus: order.overallStatus,
+      createdAt: order.createdAt,
+    };
+  });
+
+  res.status(200).json(sellerOrders);
+});
+
 const getAllOrders = asyncHandler(async (req, res) => {
   const orders = await Order.find({})
     .populate("user", "name email")
@@ -176,4 +207,5 @@ module.exports = {
   createOrder,
   updateOrderStatus,
   updateItemStatus,
+  getSellerOrders,
 };

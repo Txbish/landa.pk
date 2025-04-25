@@ -2,8 +2,7 @@
 
 import { useAuth } from "@/context/AuthContext";
 import { useEffect, useState } from "react";
-import { fetchUserOrders } from "@/services/orderService";
-import { fetchProducts } from "@/services/productService";
+import { fetchSellerOrders } from "@/services/orderService";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
@@ -24,11 +23,11 @@ import {
 import { Input } from "@/components/ui/input";
 import { Search, Eye } from "lucide-react";
 import { OrderDetailsModal } from "@/components/dashboard/orders/order-details-modal";
-import type { Order, Product } from "@/lib/types";
+import type { Order } from "@/lib/types";
+
 export default function OrdersPage() {
   const { user } = useAuth();
   const [orders, setOrders] = useState<Order[]>([]);
-  const [sellerProducts, setSellerProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -39,21 +38,7 @@ export default function OrdersPage() {
     const loadData = async () => {
       try {
         setLoading(true);
-
-        const productsData = await fetchProducts();
-        const sellerProds = productsData.products.filter(
-          (product) => product.seller._id === user?._id
-        );
-        setSellerProducts(sellerProds);
-
-        const ordersData = await fetchUserOrders();
-
-        const sellerOrders = ordersData.orders.filter((order: Order) =>
-          order.items.some((item) =>
-            sellerProds.some((product) => product._id === item.product._id)
-          )
-        );
-
+        const sellerOrders = await fetchSellerOrders();
         setOrders(sellerOrders);
       } catch (error) {
         console.error("Failed to load orders:", error);
@@ -67,7 +52,6 @@ export default function OrdersPage() {
     }
   }, [user]);
 
-  // Filter orders based on search term and status
   const filteredOrders = orders.filter((order) => {
     const matchesSearch =
       searchTerm === "" ||
@@ -81,8 +65,8 @@ export default function OrdersPage() {
   });
 
   const handleOrderUpdate = (updatedOrder: Order) => {
-    setOrders(
-      orders.map((order) =>
+    setOrders((prev) =>
+      prev.map((order) =>
         order._id === updatedOrder._id ? updatedOrder : order
       )
     );
@@ -149,64 +133,47 @@ export default function OrdersPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredOrders.map((order) => {
-                    // Count only items that belong to this seller
-                    const sellerItems = order.items.filter((item) =>
-                      sellerProducts.some(
-                        (product) => product._id === item.product._id
-                      )
-                    );
-
-                    return (
-                      <TableRow key={order._id}>
-                        <TableCell className="font-medium">
-                          {order._id.substring(0, 8)}...
-                        </TableCell>
-                        <TableCell>{order.contactName}</TableCell>
-                        <TableCell>
-                          {new Date(order.createdAt).toLocaleDateString()}
-                        </TableCell>
-                        <TableCell>{sellerItems.length}</TableCell>
-                        <TableCell>
-                          $
-                          {sellerItems
-                            .reduce((total, item) => {
-                              const product = sellerProducts.find(
-                                (p) => p._id === item.product._id
-                              );
-                              return total + (product?.price || 0);
-                            }, 0)
-                            .toFixed(2)}
-                        </TableCell>
-                        <TableCell>
-                          <span
-                            className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${
-                              order.overallStatus === "Completed"
-                                ? "bg-green-100 text-green-800"
-                                : order.overallStatus === "Cancelled"
-                                ? "bg-red-100 text-red-800"
-                                : "bg-yellow-100 text-yellow-800"
-                            }`}
-                          >
-                            {order.overallStatus}
-                          </span>
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => {
-                              setSelectedOrder(order);
-                              setDetailsModalOpen(true);
-                            }}
-                          >
-                            <Eye className="mr-2 h-4 w-4" />
-                            View
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })}
+                  {filteredOrders.map((order) => (
+                    <TableRow key={order._id}>
+                      <TableCell className="font-medium">
+                        {order._id.substring(0, 8)}...
+                      </TableCell>
+                      <TableCell>{order.contactName}</TableCell>
+                      <TableCell>
+                        {new Date(order.createdAt).toLocaleDateString()}
+                      </TableCell>
+                      <TableCell>{order.items.length}</TableCell>
+                      <TableCell>
+                        ${order.totalAmount?.toFixed(2) ?? "0.00"}
+                      </TableCell>
+                      <TableCell>
+                        <span
+                          className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${
+                            order.overallStatus === "Completed"
+                              ? "bg-green-100 text-green-800"
+                              : order.overallStatus === "Cancelled"
+                              ? "bg-red-100 text-red-800"
+                              : "bg-yellow-100 text-yellow-800"
+                          }`}
+                        >
+                          {order.overallStatus}
+                        </span>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            setSelectedOrder(order);
+                            setDetailsModalOpen(true);
+                          }}
+                        >
+                          <Eye className="mr-2 h-4 w-4" />
+                          View
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
                 </TableBody>
               </Table>
             </div>
@@ -219,7 +186,6 @@ export default function OrdersPage() {
           open={detailsModalOpen}
           onClose={() => setDetailsModalOpen(false)}
           order={selectedOrder}
-          sellerProducts={sellerProducts}
           onOrderUpdate={handleOrderUpdate}
         />
       )}

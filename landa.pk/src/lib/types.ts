@@ -60,6 +60,7 @@ export interface CreateOrderPayload {
 export interface OrderItem {
   _id: string;
   product: Product; 
+  seller: User;
   itemStatus: "Pending" | "Cancelled" | "Completed"; 
 }
 export interface Order {
