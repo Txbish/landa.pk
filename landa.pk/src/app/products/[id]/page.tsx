@@ -1,28 +1,38 @@
-import { notFound } from "next/navigation";
+// app/products/[id]/page.tsx
+"use client";
+
+import useSWR from "swr";
+import { useParams } from "next/navigation";
 import { Suspense } from "react";
 import ProductDetail from "@/components/products/product-detail";
 import ProductDetailSkeleton from "@/components/products/product-detail-skeleton";
 import { fetchProductById } from "@/services/productService";
 
-export default async function ProductPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
-  try {
-    const { id } = await params;
-    console.log("Product ID:", id);
-    const product = await fetchProductById(id);
-    console.log("Product data:", product);
+const fetcher = (id: string) => fetchProductById(id);
 
-    return (
-      <div className="container mx-auto px-4 py-8">
-        <Suspense fallback={<ProductDetailSkeleton />}>
-          <ProductDetail product={product} />
-        </Suspense>
-      </div>
-    );
-  } catch (error) {
-    notFound();
+export default function ProductPage() {
+  const params = useParams();
+  const id = params?.id as string;
+
+  const { data: product, error, isLoading } = useSWR(id, fetcher);
+
+  if (error) {
+    return <div>Product not found.</div>; // or use `notFound()` via router
   }
+
+  if (isLoading) {
+    return <ProductDetailSkeleton />;
+  }
+
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <Suspense fallback={<ProductDetailSkeleton />}>
+        {product ? (
+          <ProductDetail product={product} />
+        ) : (
+          <ProductDetailSkeleton />
+        )}
+      </Suspense>
+    </div>
+  );
 }
