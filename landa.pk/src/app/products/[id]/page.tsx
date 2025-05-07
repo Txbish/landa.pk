@@ -17,7 +17,7 @@ export default function ProductPage() {
   const { data: product, error, isLoading } = useSWR(id, fetcher);
 
   if (error) {
-    return <div>Product not found.</div>; // or use `notFound()` via router
+    return <div>Product not found.</div>;
   }
 
   if (isLoading) {

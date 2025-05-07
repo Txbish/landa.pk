@@ -7,6 +7,7 @@ const session = require("express-session");
 const cookieParser = require("cookie-parser");
 const MongoStore = require("connect-mongo");
 const path = require("path");
+const rateLimit = require("express-rate-limit");
 
 const userRoutes = require("./routes/userRoutes");
 const orderRoutes = require("./routes/orderRoutes");
@@ -18,7 +19,16 @@ const { seedAdmin } = require("./utils/seed");
 dotenv.config();
 
 const app = express();
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+// === Rate Limiting ===
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: "Too many requests from this IP, please try again after 15 minutes",
+});
+
+app.use(limiter);
 
 // === Allowed Origins for CORS ===
 const allowedOrigins = [
