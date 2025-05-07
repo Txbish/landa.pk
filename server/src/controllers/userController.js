@@ -159,6 +159,26 @@ const updatePassword = asyncHandler(async (req, res) => {
 
   res.json({ message: "Password updated successfully" });
 });
+const getAllUsers = asyncHandler(async (req, res) => {
+  const users = await User.find({});
+  res.json(users);
+});
+
+const toggleBlockUser = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.params.id);
+
+  if (user) {
+    user.isBlocked = !user.isBlocked;
+    await user.save();
+    res.json({
+      message: "User block status updated",
+      isBlocked: user.isBlocked,
+    });
+  } else {
+    res.status(404);
+    throw new Error("User not found");
+  }
+});
 
 module.exports = {
   logoutUser,
@@ -167,4 +187,6 @@ module.exports = {
   updatePassword,
   loginUser,
   registerUser,
+  getAllUsers,
+  toggleBlockUser,
 };

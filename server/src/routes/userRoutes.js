@@ -7,8 +7,10 @@ const {
   updatePassword,
   loginUser,
   registerUser,
+  getAllUsers,
+  toggleBlockUser,
 } = require("../controllers/userController");
-const { authenticate } = require("../middleware/auth");
+const { authenticate, admin } = require("../middleware/auth");
 
 router.route("/profile").get(authenticate, getUserProfile);
 
@@ -21,4 +23,8 @@ router.route("/login").post(loginUser);
 router.post("/logout", authenticate, logoutUser);
 
 router.route("/register").post(registerUser);
+
+router.route("/").get(authenticate, admin, getAllUsers);
+router.route("/:id/toggle-block").put(authenticate, admin, toggleBlockUser);
+
 module.exports = router;
