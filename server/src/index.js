@@ -8,6 +8,8 @@ const cookieParser = require("cookie-parser");
 const MongoStore = require("connect-mongo");
 const path = require("path");
 const rateLimit = require("express-rate-limit");
+const mongoSanitize = require("express-mongo-sanitize");
+const xss = require("xss-clean");
 
 const userRoutes = require("./routes/userRoutes");
 const orderRoutes = require("./routes/orderRoutes");
@@ -19,6 +21,7 @@ const { seedAdmin } = require("./utils/seed");
 dotenv.config();
 
 const app = express();
+
 // === Rate Limiting ===
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -27,26 +30,27 @@ const limiter = rateLimit({
   legacyHeaders: false,
   message: "Too many requests from this IP, please try again after 15 minutes",
 });
-
 app.use(limiter);
 
-// === Allowed Origins for CORS ===
+// === Body Parsers ===
+app.use(express.json());
+app.use(cookieParser());
+
+// === Data Sanitization ===
+app.use(mongoSanitize());
+app.use(xss());
+
+// === CORS Configuration ===
 const allowedOrigins = [
   "http://localhost:3000",
   "http://127.0.0.1:3000",
   "https://landa-pk.vercel.app",
 ];
 
-// === Middleware ===
-app.use(express.json());
-app.use(cookieParser());
-
-// === CORS Middleware ===
 app.use(
   cors({
     origin: (origin, callback) => {
-      console.log("CORS Origin:", origin); // Debug line
-
+      console.log("CORS Origin:", origin); // Debug
       if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
@@ -57,7 +61,6 @@ app.use(
   })
 );
 
-// === Handle Preflight (OPTIONS) Requests Globally ===
 app.options(
   "*",
   cors({
@@ -83,15 +86,15 @@ app.use(
       collectionName: "sessions",
     }),
     cookie: {
-      secure: process.env.NODE_ENV === "production", // Only true in prod over HTTPS
+      secure: process.env.NODE_ENV === "production",
       httpOnly: true,
-      maxAge: 1000 * 60 * 60 * 24, // 1 day
-      sameSite: "lax", // 'lax' is safe for most cross-site cookie needs
+      maxAge: 1000 * 60 * 60 * 24,
+      sameSite: "lax",
     },
   })
 );
 
-// === Logging ===
+// === Logger ===
 app.use(morgan(process.env.NODE_ENV === "development" ? "dev" : "combined"));
 
 // === Routes ===
@@ -106,13 +109,12 @@ app.get("/", (req, res) => {
   res.send("Welcome to Landa.pk API!");
 });
 
-// === MongoDB Connection & Server Startup ===
+// === Start Server ===
 const startServer = async () => {
   try {
     await mongoose.connect(process.env.MONGO_URI);
     console.log("✅ MongoDB connected");
 
-    // Seed the admin user
     await seedAdmin();
 
     const PORT = process.env.PORT || 5000;
