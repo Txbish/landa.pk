@@ -33,7 +33,7 @@ export const updateItemStatus = async (
   itemId: string,
   itemStatus: "Pending" | "Cancelled" | "Completed"
 ) => {
-  const response = await axiosInstance.put(`/orders/${orderId}`, {
+  const response = await axiosInstance.put(`/orders/${orderId}/item`, {
     itemId,
     itemStatus,
   });
