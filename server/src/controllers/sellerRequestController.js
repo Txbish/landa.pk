@@ -70,8 +70,10 @@ const handleSellerRequest = asyncHandler(async (req, res) => {
 
   if (status === "Approved") {
     user.role = "seller";
+    user.businessName = sellerRequest.businessName; // Set business name
   } else if (status === "Rejected") {
     user.role = "user";
+    user.businessName = undefined; // Optionally clear business name
   }
 
   await user.save();
