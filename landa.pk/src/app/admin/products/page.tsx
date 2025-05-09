@@ -295,28 +295,8 @@ export default function ProductsPage() {
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align="end">
                                 <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                <DropdownMenuItem
-                                  onClick={() =>
-                                    router.push(
-                                      `/admin/products/${product._id}`
-                                    )
-                                  }
-                                >
-                                  <Eye className="mr-2 h-4 w-4" />
-                                  View Details
-                                </DropdownMenuItem>
                                 {!product.isDeleted && (
                                   <>
-                                    <DropdownMenuItem
-                                      onClick={() =>
-                                        router.push(
-                                          `/admin/products/${product._id}/edit`
-                                        )
-                                      }
-                                    >
-                                      <Edit className="mr-2 h-4 w-4" />
-                                      Edit
-                                    </DropdownMenuItem>
                                     <DropdownMenuItem
                                       onClick={() =>
                                         handleToggleAvailability(
