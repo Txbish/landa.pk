@@ -220,7 +220,9 @@ export default function SellerRequestPage() {
                   Congratulations! Your seller application has been approved.
                   You can now access the seller dashboard.
                 </p>
-                <Button className="w-full">Go to Seller Dashboard</Button>
+                <Link href="/seller-dashboard">
+                  <Button className="w-full">Go to Seller Dashboard</Button>
+                </Link>
               </div>
             )}
           </CardFooter>
