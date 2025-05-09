@@ -280,7 +280,7 @@ export default function OrderDetailsPage({
                           value={item.itemStatus}
                           onValueChange={(
                             value: "Pending" | "Cancelled" | "Completed"
-                          ) => handleUpdateItemStatus(item._id, value)}
+                          ) => handleUpdateItemStatus(item.product._id, value)}
                         >
                           <SelectTrigger className="w-[140px]">
                             <SelectValue placeholder="Item Status" />
@@ -330,10 +330,6 @@ export default function OrderDetailsPage({
               <div className="flex justify-between">
                 <span>Subtotal</span>
                 <span>${order.totalAmount?.toFixed(2) || "0.00"}</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Shipping</span>
-                <span>$0.00</span>
               </div>
               <Separator />
               <div className="flex justify-between font-bold">

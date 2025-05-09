@@ -133,7 +133,22 @@ const createOrder = asyncHandler(async (req, res) => {
   res.status(201).json(order);
 });
 
-// Manually update overall order status (Admin/Seller control)
+const recalculateOrderTotal = async (order) => {
+  let total = 0;
+
+  for (const item of order.items) {
+    if (item.itemStatus !== "Cancelled") {
+      const product = await Product.findById(item.product);
+      if (product) {
+        total += product.price;
+      }
+    }
+  }
+
+  order.totalAmount = total;
+  return order;
+};
+
 const updateOrderStatus = asyncHandler(async (req, res) => {
   const { status } = req.body;
   const order = await Order.findById(req.params.id);
@@ -143,8 +158,59 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
     throw new Error("Order not found");
   }
 
+  // Check if the status provided is valid
   if (status && ["Pending", "Cancelled", "Completed"].includes(status)) {
-    order.overallStatus = status;
+    let partialCompleted = false;
+
+    // Handle Completed status logic
+    if (status === "Completed") {
+      // Update all Pending items to Completed and leave Cancelled items as is
+      for (const item of order.items) {
+        if (item.itemStatus === "Pending") {
+          await updateItemStatus(req, res); // Using the existing updateItemStatus function
+        }
+      }
+
+      const allItemsCompleted = order.items.every(
+        (item) => item.itemStatus === "Completed"
+      );
+
+      // If all items are completed, set the order as completed
+      if (allItemsCompleted) {
+        order.overallStatus = "Completed";
+      } else {
+        // If some are completed and others are still pending, set it as partial completed
+        partialCompleted = order.items.some(
+          (item) => item.itemStatus === "Completed"
+        );
+        if (partialCompleted) {
+          order.overallStatus = "Partial Completed";
+        } else {
+          res.status(400);
+          throw new Error(
+            "Cannot mark order as Completed because not all items are completed"
+          );
+        }
+      }
+    }
+
+    // Handle Cancelled status logic
+    if (status === "Cancelled") {
+      // Update all Pending items to Cancelled and leave Completed items as is
+      for (const item of order.items) {
+        if (item.itemStatus === "Pending") {
+          await updateItemStatus(req, res); // Using the existing updateItemStatus function
+        }
+      }
+
+      const allItemsCancelled = order.items.every(
+        (item) => item.itemStatus === "Cancelled"
+      );
+      if (allItemsCancelled) {
+        order.overallStatus = "Cancelled";
+      }
+    }
+
     await order.save();
     res.status(200).json(order);
   } else {
@@ -173,13 +239,18 @@ const updateItemStatus = asyncHandler(async (req, res) => {
     throw new Error("Invalid item status");
   }
 
-  // If item is moving to "Completed" from another status
-  const isBecomingCompleted =
-    item.itemStatus !== "Completed" && itemStatus === "Completed";
+  if (item.itemStatus !== "Pending") {
+    res.status(400);
+    throw new Error(
+      "Cannot update an item that is already Cancelled or Completed"
+    );
+  }
+
+  const isBecomingCompleted = itemStatus === "Completed";
+  const isBecomingCancelled = itemStatus === "Cancelled";
 
   item.itemStatus = itemStatus;
 
-  // 💰 Update seller's earnings
   if (isBecomingCompleted) {
     const product = await Product.findById(item.product);
     const seller = await User.findById(item.seller);
@@ -190,12 +261,23 @@ const updateItemStatus = asyncHandler(async (req, res) => {
     }
   }
 
-  // Update overall order status if all items are fulfilled
-  const allDone = order.items.every((i) => i.itemStatus === "Completed");
-  if (allDone) {
-    order.overallStatus = "Completed";
+  // ✅ Mark product available again if item is cancelled
+  if (isBecomingCancelled) {
+    const product = await Product.findById(item.product);
+    if (product) {
+      product.isAvailable = true;
+      await product.save();
+    }
   }
 
+  // ✅ Update overall order status
+  const allFinal = order.items.every((i) => i.itemStatus !== "Pending");
+  const anyCompleted = order.items.some((i) => i.itemStatus === "Completed");
+
+  if (allFinal) {
+    order.overallStatus = anyCompleted ? "Completed" : "Cancelled";
+  }
+  await recalculateOrderTotal(order);
   await order.save();
   res.status(200).json(order);
 });
