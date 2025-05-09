@@ -79,19 +79,17 @@ function DashboardSidebar() {
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
-          {user?.role === "user" && (
-            <SidebarMenuItem>
-              <SidebarMenuButton
-                asChild
-                isActive={pathname === "/dashboard/seller-request"}
-              >
-                <Link href="/dashboard/seller-request">
-                  <Store className="h-4 w-4" />
-                  <span>Seller Request</span>
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          )}
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              asChild
+              isActive={pathname === "/dashboard/seller-request"}
+            >
+              <Link href="/dashboard/seller-request">
+                <Store className="h-4 w-4" />
+                <span>Seller Request</span>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
         </SidebarMenu>
       </SidebarContent>
       <SidebarFooter className="border-t p-4">
