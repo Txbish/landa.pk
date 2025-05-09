@@ -36,15 +36,18 @@ import {
   updateOrderStatus,
   updateItemStatus,
 } from "@/services/orderService";
-import { Order, OrderItem } from "@/lib/types"; // Import types from types.ts
+import { Order, OrderItem } from "@/lib/types";
 
 export default function MyOrdersPage() {
   const { user, loading } = useAuth();
   const [orders, setOrders] = useState<Order[]>([]);
   const [isLoadingOrders, setIsLoadingOrders] = useState(true);
+
   const [cancelItemId, setCancelItemId] = useState<string | null>(null);
   const [cancelOrderId, setCancelOrderId] = useState<string | null>(null);
   const [isCancelling, setIsCancelling] = useState(false);
+  const [openItemDialog, setOpenItemDialog] = useState(false);
+  const [openOrderDialog, setOpenOrderDialog] = useState(false);
 
   useEffect(() => {
     const loadOrders = async () => {
@@ -60,35 +63,37 @@ export default function MyOrdersPage() {
       }
     };
 
-    if (user) {
-      loadOrders();
-    }
+    if (user) loadOrders();
   }, [user]);
 
   const handleCancelItem = async () => {
-    if (!cancelOrderId) return;
-    if (!cancelItemId) return;
+    if (!cancelOrderId || !cancelItemId) return;
 
     setIsCancelling(true);
     try {
-      await updateItemStatus(cancelOrderId, cancelItemId, "Cancelled"); // Update item status
-      setOrders((prevOrders) =>
-        prevOrders.map((order) => ({
-          ...order,
-          items: order.items.map((item) =>
-            item._id === cancelItemId
-              ? { ...item, itemStatus: "Cancelled" }
-              : item
-          ),
-        }))
+      await updateItemStatus(cancelOrderId, cancelItemId, "Cancelled");
+      setOrders((prev) =>
+        prev.map((order) =>
+          order._id === cancelOrderId
+            ? {
+                ...order,
+                items: order.items.map((item) =>
+                  item._id === cancelItemId
+                    ? { ...item, itemStatus: "Cancelled" }
+                    : item
+                ),
+              }
+            : order
+        )
       );
-      toast.success("The item has been cancelled successfully.");
-    } catch (error) {
-      console.error("Failed to cancel item:", error);
-      toast.error("Failed to cancel the item. Please try again.");
+      toast.success("Item cancelled successfully.");
+    } catch (err) {
+      toast.error("Failed to cancel item.");
     } finally {
       setIsCancelling(false);
       setCancelItemId(null);
+      setCancelOrderId(null);
+      setOpenItemDialog(false);
     }
   };
 
@@ -97,9 +102,9 @@ export default function MyOrdersPage() {
 
     setIsCancelling(true);
     try {
-      await updateOrderStatus(cancelOrderId, "Cancelled"); // Update order status
-      setOrders((prevOrders) =>
-        prevOrders.map((order) =>
+      await updateOrderStatus(cancelOrderId, "Cancelled");
+      setOrders((prev) =>
+        prev.map((order) =>
           order._id === cancelOrderId
             ? {
                 ...order,
@@ -112,13 +117,13 @@ export default function MyOrdersPage() {
             : order
         )
       );
-      toast.success("The order has been cancelled successfully.");
-    } catch (error) {
-      console.error("Failed to cancel order:", error);
-      toast.error("Failed to cancel the order. Please try again.");
+      toast.success("Order cancelled successfully.");
+    } catch (err) {
+      toast.error("Failed to cancel order.");
     } finally {
       setIsCancelling(false);
       setCancelOrderId(null);
+      setOpenOrderDialog(false);
     }
   };
 
@@ -130,49 +135,27 @@ export default function MyOrdersPage() {
       | "Partial Completed"
       | "Partial Cancelled"
   ) => {
-    switch (status) {
-      case "Pending":
-        return (
-          <Badge variant="outline" className="bg-yellow-50 text-yellow-700">
-            Pending
-          </Badge>
-        );
-      case "Cancelled":
-        return (
-          <Badge variant="outline" className="bg-red-50 text-red-700">
-            Cancelled
-          </Badge>
-        );
-      case "Completed":
-        return (
-          <Badge variant="outline" className="bg-green-50 text-green-700">
-            Completed
-          </Badge>
-        );
-      case "Partial Completed":
-        return (
-          <Badge variant="outline" className="bg-blue-50 text-blue-700">
-            Partial Completed
-          </Badge>
-        );
-      case "Partial Cancelled":
-        return (
-          <Badge variant="outline" className="bg-orange-50 text-orange-700">
-            Partial Cancelled
-          </Badge>
-        );
-      default:
-        return null;
-    }
+    const badgeStyles: Record<string, string> = {
+      Pending: "bg-yellow-50 text-yellow-700",
+      Cancelled: "bg-red-50 text-red-700",
+      Completed: "bg-green-50 text-green-700",
+      "Partial Completed": "bg-blue-50 text-blue-700",
+      "Partial Cancelled": "bg-orange-50 text-orange-700",
+    };
+
+    return (
+      <Badge variant="outline" className={badgeStyles[status]}>
+        {status}
+      </Badge>
+    );
   };
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
+  const formatDate = (dateString: string) =>
+    new Date(dateString).toLocaleDateString("en-US", {
       year: "numeric",
       month: "long",
       day: "numeric",
     });
-  };
 
   if (loading || isLoadingOrders) {
     return (
@@ -204,7 +187,6 @@ export default function MyOrdersPage() {
   return (
     <div className="mx-auto max-w-4xl space-y-6">
       <h1 className="text-2xl font-bold">My Orders</h1>
-
       <Accordion type="single" collapsible className="space-y-4">
         {orders.map((order) => (
           <AccordionItem
@@ -261,55 +243,19 @@ export default function MyOrdersPage() {
                         <TableCell>{getStatusBadge(item.itemStatus)}</TableCell>
                         <TableCell>
                           {item.itemStatus === "Pending" && (
-                            <Dialog
-                              open={cancelItemId === item._id}
-                              onOpenChange={(open) => {
-                                if (!open) setCancelItemId(null);
-                              }}
-                            >
-                              <DialogTrigger asChild>
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() => {
-                                    setCancelItemId(item._id);
-                                    setCancelOrderId(order._id); // Also set the order ID for the item
-                                  }}
-                                >
-                                  Cancel
-                                </Button>
-                              </DialogTrigger>
-                              <DialogContent>
-                                <DialogHeader>
-                                  <DialogTitle>Cancel Item</DialogTitle>
-                                  <DialogDescription>
-                                    Are you sure you want to cancel this item?
-                                    This action cannot be undone.
-                                  </DialogDescription>
-                                </DialogHeader>
-                                <DialogFooter>
-                                  <Button
-                                    variant="outline"
-                                    onClick={() => setCancelItemId(null)}
-                                  >
-                                    No, keep it
-                                  </Button>
-                                  <Button
-                                    variant="destructive"
-                                    onClick={async () => {
-                                      await handleCancelItem();
-                                      setCancelItemId(null); // Close dialog after action
-                                    }}
-                                    disabled={isCancelling}
-                                  >
-                                    {isCancelling && (
-                                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                    )}
-                                    Yes, cancel item
-                                  </Button>
-                                </DialogFooter>
-                              </DialogContent>
-                            </Dialog>
+                            <>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => {
+                                  setCancelItemId(item._id);
+                                  setCancelOrderId(order._id);
+                                  setOpenItemDialog(true);
+                                }}
+                              >
+                                Cancel
+                              </Button>
+                            </>
                           )}
                         </TableCell>
                       </TableRow>
@@ -318,59 +264,20 @@ export default function MyOrdersPage() {
                 </Table>
 
                 <div className="mt-6 flex justify-between">
-                  <div>
-                    <p className="text-sm font-medium">
-                      Order Total: ${order.totalAmount.toFixed(2)}
-                    </p>
-                  </div>
+                  <p className="text-sm font-medium">
+                    Order Total: ${order.totalAmount.toFixed(2)}
+                  </p>
                   {order.overallStatus === "Pending" && (
-                    <Dialog
-                      open={cancelOrderId === order._id}
-                      onOpenChange={(open) => {
-                        if (!open) setCancelOrderId(null);
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => {
+                        setCancelOrderId(order._id);
+                        setOpenOrderDialog(true);
                       }}
                     >
-                      <DialogTrigger asChild>
-                        <Button
-                          variant="destructive"
-                          size="sm"
-                          onClick={() => setCancelOrderId(order._id)}
-                        >
-                          Cancel Order
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent>
-                        <DialogHeader>
-                          <DialogTitle>Cancel Order</DialogTitle>
-                          <DialogDescription>
-                            Are you sure you want to cancel this entire order?
-                            This action cannot be undone and will cancel all
-                            items in this order.
-                          </DialogDescription>
-                        </DialogHeader>
-                        <DialogFooter>
-                          <Button
-                            variant="outline"
-                            onClick={() => setCancelOrderId(null)}
-                          >
-                            No, keep it
-                          </Button>
-                          <Button
-                            variant="destructive"
-                            onClick={async () => {
-                              await handleCancelOrder();
-                              setCancelOrderId(null); // Close dialog after action
-                            }}
-                            disabled={isCancelling}
-                          >
-                            {isCancelling && (
-                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            )}
-                            Yes, cancel order
-                          </Button>
-                        </DialogFooter>
-                      </DialogContent>
-                    </Dialog>
+                      Cancel Order
+                    </Button>
                   )}
                 </div>
               </div>
@@ -378,6 +285,60 @@ export default function MyOrdersPage() {
           </AccordionItem>
         ))}
       </Accordion>
+
+      {/* Cancel Item Dialog */}
+      <Dialog open={openItemDialog} onOpenChange={setOpenItemDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Cancel Item</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to cancel this item?
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setOpenItemDialog(false)}>
+              No, keep it
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleCancelItem}
+              disabled={isCancelling}
+            >
+              {isCancelling && (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              )}
+              Yes, cancel item
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Cancel Order Dialog */}
+      <Dialog open={openOrderDialog} onOpenChange={setOpenOrderDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Cancel Order</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to cancel this order and all its items?
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setOpenOrderDialog(false)}>
+              No, keep it
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleCancelOrder}
+              disabled={isCancelling}
+            >
+              {isCancelling && (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              )}
+              Yes, cancel order
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
