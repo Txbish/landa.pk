@@ -24,6 +24,7 @@ const getCart = asyncHandler(async (req, res) => {
   res.status(200).json({ cart: cleanedCart });
 });
 
+// ...existing code...
 const addToCart = asyncHandler(async (req, res) => {
   const { productId } = req.body;
 
@@ -35,9 +36,24 @@ const addToCart = asyncHandler(async (req, res) => {
     throw new Error("User not found");
   }
 
+  // Prevent admin from adding items to cart
+  if (user.role === "admin") {
+    res.status(403);
+    throw new Error("Admins cannot add items to cart");
+  }
+
   if (!product || !product.isAvailable) {
     res.status(400);
     throw new Error("Product not available or doesn't exist");
+  }
+
+  // Prevent sellers from adding their own products
+  if (
+    user.role === "seller" &&
+    product.seller.toString() === user._id.toString()
+  ) {
+    res.status(403);
+    throw new Error("Sellers cannot add their own products to cart");
   }
 
   const alreadyInCart = user.cart.some(
@@ -59,6 +75,7 @@ const addToCart = asyncHandler(async (req, res) => {
 
   res.status(200).json({ cart: cleanedCart });
 });
+// ...existing code...
 
 const removeFromCart = asyncHandler(async (req, res) => {
   const { productId } = req.params;

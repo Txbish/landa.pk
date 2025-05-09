@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import {
   ArrowLeft,
   Package,
@@ -277,7 +278,7 @@ export default function OrderDetailsPage({
                         <div className="flex items-center">
                           <div className="h-10 w-10 flex-shrink-0 rounded-md bg-gray-100">
                             {item.product?.image ? (
-                              <img
+                              <Image
                                 src={item.product.image || "/placeholder.svg"}
                                 alt={item.product.title}
                                 className="h-10 w-10 rounded-md object-cover"

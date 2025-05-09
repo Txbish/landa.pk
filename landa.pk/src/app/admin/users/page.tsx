@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import {
   MoreHorizontal,
   Search,
@@ -305,7 +306,7 @@ export default function UsersPage() {
               <div className="flex items-center space-x-4">
                 <div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center">
                   {selectedUser.profileImage ? (
-                    <img
+                    <Image
                       src={selectedUser.profileImage || "/placeholder.svg"}
                       alt={selectedUser.name}
                       className="h-12 w-12 rounded-full object-cover"

@@ -146,12 +146,6 @@ export default function ProductsPage() {
           <h1 className="text-3xl font-bold">Products</h1>
           <p className="text-muted-foreground">Manage your store products.</p>
         </div>
-        <Button
-          className="mt-4 sm:mt-0"
-          onClick={() => router.push("/admin/products/add")}
-        >
-          <Plus className="mr-2 h-4 w-4" /> Add Product
-        </Button>
       </div>
 
       <Card>

@@ -64,19 +64,43 @@ const getOrderById = asyncHandler(async (req, res) => {
 
 const createOrder = asyncHandler(async (req, res) => {
   const userId = req.user._id;
-  const { shippingAddress, additionalNotes } = req.body;
+  const {
+    shippingAddress,
+    additionalNotes,
+    contactName,
+    contactEmail,
+    contactPhone,
+  } = req.body;
+
+  const user = await User.findById(userId).populate("cart.product");
+
+  if (user.role === "admin") {
+    res.status(403);
+    throw new Error("Admins cannot place orders");
+  }
 
   console.log("[createOrder] userId:", userId);
   console.log("[createOrder] shippingAddress:", shippingAddress);
   console.log("[createOrder] additionalNotes:", additionalNotes);
 
-  const user = await User.findById(userId).populate("cart.product");
   console.log("[createOrder] user:", user);
 
   if (!user || !user.cart || user.cart.length === 0) {
     console.error("[createOrder] Cart is empty or user not found");
     res.status(400);
     throw new Error("Your cart is empty");
+  }
+  if (user.role === "seller") {
+    const ownsProduct = user.cart.some(
+      (item) =>
+        item.product &&
+        item.product.seller &&
+        item.product.seller.toString() === user._id.toString()
+    );
+    if (ownsProduct) {
+      res.status(403);
+      throw new Error("Sellers cannot buy their own products");
+    }
   }
 
   const orderItems = [];
@@ -98,6 +122,7 @@ const createOrder = asyncHandler(async (req, res) => {
     orderItems.push({
       product: product._id,
       itemStatus: "Pending",
+      seller: product.seller,
     });
   }
 
@@ -117,15 +142,14 @@ const createOrder = asyncHandler(async (req, res) => {
     items: orderItems,
     totalAmount,
     shippingAddress,
-    contactName: user.name,
-    contactEmail: user.email,
-    contactPhone: user.phone,
+    contactName: contactName,
+    contactEmail: contactEmail,
+    contactPhone: contactPhone,
     additionalNotes,
   });
 
   console.log("[createOrder] Created order:", order);
 
-  // 🧹 Clear cart
   user.cart = [];
   await user.save();
   console.log("[createOrder] Cleared user cart");
