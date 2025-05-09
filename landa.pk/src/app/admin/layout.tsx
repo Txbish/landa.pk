@@ -13,6 +13,7 @@ import {
   Users,
   Menu,
   X,
+  Home,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -107,6 +108,17 @@ export default function AdminLayout({
                 );
               })}
             </nav>
+            <div className="p-2 mt-auto">
+              <Separator />
+              <Link
+                href="/"
+                onClick={() => setOpen(false)}
+                className="mt-2 flex items-center rounded-md px-3 py-2 text-sm font-medium hover:bg-muted"
+              >
+                <Home className="mr-3 h-5 w-5" />
+                Home
+              </Link>
+            </div>
           </div>
         </SheetContent>
       </Sheet>
@@ -138,6 +150,16 @@ export default function AdminLayout({
               );
             })}
           </nav>
+          <div className="p-2 mt-auto">
+            <Separator />
+            <Link
+              href="/"
+              className="mt-2 flex items-center rounded-md px-3 py-2 text-sm font-medium hover:bg-muted"
+            >
+              <Home className="mr-3 h-5 w-5" />
+              Home
+            </Link>
+          </div>
         </div>
       </div>
 
