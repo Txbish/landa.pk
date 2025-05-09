@@ -2,7 +2,10 @@ const SellerRequest = require("../models/SellerRequest");
 const asyncHandler = require("express-async-handler");
 
 const getSellerRequests = asyncHandler(async (req, res) => {
-  const sellerRequests = await SellerRequest.find({});
+  const sellerRequests = await SellerRequest.find({}).populate(
+    "user",
+    "name email"
+  );
   res.status(200).json(sellerRequests);
 });
 const getUserSellerRequest = asyncHandler(async (req, res) => {
