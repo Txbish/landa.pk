@@ -261,12 +261,20 @@ export default function MyOrdersPage() {
                         <TableCell>{getStatusBadge(item.itemStatus)}</TableCell>
                         <TableCell>
                           {item.itemStatus === "Pending" && (
-                            <Dialog>
+                            <Dialog
+                              open={cancelItemId === item._id}
+                              onOpenChange={(open) => {
+                                if (!open) setCancelItemId(null);
+                              }}
+                            >
                               <DialogTrigger asChild>
                                 <Button
                                   variant="outline"
                                   size="sm"
-                                  onClick={() => setCancelItemId(item._id)}
+                                  onClick={() => {
+                                    setCancelItemId(item._id);
+                                    setCancelOrderId(order._id); // Also set the order ID for the item
+                                  }}
                                 >
                                   Cancel
                                 </Button>
@@ -288,7 +296,10 @@ export default function MyOrdersPage() {
                                   </Button>
                                   <Button
                                     variant="destructive"
-                                    onClick={handleCancelItem}
+                                    onClick={async () => {
+                                      await handleCancelItem();
+                                      setCancelItemId(null); // Close dialog after action
+                                    }}
                                     disabled={isCancelling}
                                   >
                                     {isCancelling && (
@@ -313,7 +324,12 @@ export default function MyOrdersPage() {
                     </p>
                   </div>
                   {order.overallStatus === "Pending" && (
-                    <Dialog>
+                    <Dialog
+                      open={cancelOrderId === order._id}
+                      onOpenChange={(open) => {
+                        if (!open) setCancelOrderId(null);
+                      }}
+                    >
                       <DialogTrigger asChild>
                         <Button
                           variant="destructive"
@@ -341,7 +357,10 @@ export default function MyOrdersPage() {
                           </Button>
                           <Button
                             variant="destructive"
-                            onClick={handleCancelOrder}
+                            onClick={async () => {
+                              await handleCancelOrder();
+                              setCancelOrderId(null); // Close dialog after action
+                            }}
                             disabled={isCancelling}
                           >
                             {isCancelling && (
