@@ -121,8 +121,12 @@ export default function OrderDetailsPage({
     switch (status) {
       case "Completed":
         return <Badge className="bg-green-500">Completed</Badge>;
+      case "Partial Completed":
+        return <Badge className="bg-blue-500">Partial Completed</Badge>;
       case "Cancelled":
         return <Badge variant="destructive">Cancelled</Badge>;
+      case "Partial Cancelled":
+        return <Badge className="bg-orange-500">Partial Cancelled</Badge>;
       default:
         return (
           <Badge
