@@ -330,6 +330,45 @@ export default function OrderDetailsPage({
             </div>
           </CardContent>
         </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              <FileText className="mr-2 h-5 w-5" />
+              Order Notes
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {order.additionalNotes ? (
+              <p className="whitespace-pre-line">{order.additionalNotes}</p>
+            ) : (
+              <p className="text-muted-foreground">
+                No additional notes provided.
+              </p>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              <Truck className="mr-2 h-5 w-5" />
+              Order Summary
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              <div className="flex justify-between">
+                <span>Subtotal</span>
+                <span>${order.totalAmount?.toFixed(2) || "0.00"}</span>
+              </div>
+              <Separator />
+              <div className="flex justify-between font-bold">
+                <span>Total</span>
+                <span>${order.totalAmount?.toFixed(2) || "0.00"}</span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
