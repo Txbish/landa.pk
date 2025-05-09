@@ -189,11 +189,19 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
     // Handle Completed status logic
     if (status === "Completed") {
       // Update all Pending items to Completed and leave Cancelled items as is
-      for (const item of order.items) {
-        if (item.itemStatus === "Pending") {
-          await updateItemStatus(req, res); // Using the existing updateItemStatus function
-        }
-      }
+      await Promise.all(
+        order.items.map((item) => {
+          if (item.itemStatus === "Pending") {
+            return updateItemStatus(
+              {
+                params: { id: req.params.id }, // Keep the order ID
+                body: { itemId: item._id, itemStatus: "Completed" }, // Pass item ID and new status
+              },
+              res
+            ); // Pass response object
+          }
+        })
+      );
 
       const allItemsCompleted = order.items.every(
         (item) => item.itemStatus === "Completed"
@@ -221,17 +229,34 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
     // Handle Cancelled status logic
     if (status === "Cancelled") {
       // Update all Pending items to Cancelled and leave Completed items as is
-      for (const item of order.items) {
-        if (item.itemStatus === "Pending") {
-          await updateItemStatus(req, res); // Using the existing updateItemStatus function
-        }
-      }
+      await Promise.all(
+        order.items.map((item) => {
+          if (item.itemStatus === "Pending") {
+            return updateItemStatus(
+              {
+                params: { id: req.params.id }, // Keep the order ID
+                body: { itemId: item._id, itemStatus: "Cancelled" }, // Pass item ID and new status
+              },
+              res
+            ); // Pass response object
+          }
+        })
+      );
 
       const allItemsCancelled = order.items.every(
         (item) => item.itemStatus === "Cancelled"
       );
+
+      const anyCancelled = order.items.some(
+        (item) => item.itemStatus === "Cancelled"
+      );
+
+      // If all items are cancelled, set the order as cancelled
       if (allItemsCancelled) {
         order.overallStatus = "Cancelled";
+      } else if (anyCancelled) {
+        // If some items are cancelled, but not all, set the order as partially cancelled
+        order.overallStatus = "Partial Cancelled";
       }
     }
 
@@ -242,7 +267,6 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
     throw new Error("Invalid status");
   }
 });
-
 const updateItemStatus = asyncHandler(async (req, res) => {
   const { itemId, itemStatus } = req.body;
   const order = await Order.findById(req.params.id);
@@ -285,7 +309,7 @@ const updateItemStatus = asyncHandler(async (req, res) => {
     }
   }
 
-  // ✅ Mark product available again if item is cancelled
+  // Mark product available again if item is cancelled
   if (isBecomingCancelled) {
     const product = await Product.findById(item.product);
     if (product) {
@@ -297,10 +321,26 @@ const updateItemStatus = asyncHandler(async (req, res) => {
   // ✅ Update overall order status
   const allFinal = order.items.every((i) => i.itemStatus !== "Pending");
   const anyCompleted = order.items.some((i) => i.itemStatus === "Completed");
+  const anyCancelled = order.items.some((i) => i.itemStatus === "Cancelled");
 
   if (allFinal) {
-    order.overallStatus = anyCompleted ? "Completed" : "Cancelled";
+    if (anyCompleted && !anyCancelled) {
+      order.overallStatus = "Completed";
+    } else if (!anyCompleted && anyCancelled) {
+      order.overallStatus = "Cancelled";
+    } else if (anyCompleted && anyCancelled) {
+      order.overallStatus = "Partial Completed";
+    }
+  } else {
+    if (anyCompleted) {
+      order.overallStatus = "Partial Completed";
+    } else if (anyCancelled) {
+      order.overallStatus = "Partial Cancelled";
+    } else {
+      order.overallStatus = "Pending"; // If some items are still pending
+    }
   }
+
   await recalculateOrderTotal(order);
   await order.save();
   res.status(200).json(order);

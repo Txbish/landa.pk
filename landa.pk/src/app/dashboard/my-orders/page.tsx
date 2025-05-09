@@ -122,7 +122,14 @@ export default function MyOrdersPage() {
     }
   };
 
-  const getStatusBadge = (status: "Pending" | "Cancelled" | "Completed") => {
+  const getStatusBadge = (
+    status:
+      | "Pending"
+      | "Cancelled"
+      | "Completed"
+      | "Partial Completed"
+      | "Partial Cancelled"
+  ) => {
     switch (status) {
       case "Pending":
         return (
@@ -142,6 +149,20 @@ export default function MyOrdersPage() {
             Completed
           </Badge>
         );
+      case "Partial Completed":
+        return (
+          <Badge variant="outline" className="bg-blue-50 text-blue-700">
+            Partial Completed
+          </Badge>
+        );
+      case "Partial Cancelled":
+        return (
+          <Badge variant="outline" className="bg-orange-50 text-orange-700">
+            Partial Cancelled
+          </Badge>
+        );
+      default:
+        return null;
     }
   };
 

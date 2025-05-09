@@ -68,7 +68,7 @@ export interface Order {
   user: User | string
   items: OrderItem[]
   totalAmount: number
-  overallStatus: "Pending" | "Cancelled" | "Completed";
+  overallStatus: "Pending" | "Cancelled" | "Completed"|"Partial Completed" |"Partial Cancelled";
   shippingAddress: string
   contactName: string
   contactEmail: string

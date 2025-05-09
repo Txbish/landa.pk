@@ -94,6 +94,10 @@ export default function OrdersPage() {
         return <CheckCircle className="h-4 w-4 text-green-500" />;
       case "Cancelled":
         return <XCircle className="h-4 w-4 text-red-500" />;
+      case "Partial Completed":
+        return <CheckCircle className="h-4 w-4 text-blue-500" />;
+      case "Partial Cancelled":
+        return <XCircle className="h-4 w-4 text-orange-500" />;
       default:
         return <Clock className="h-4 w-4 text-yellow-500" />;
     }
@@ -105,6 +109,10 @@ export default function OrdersPage() {
         return <Badge className="bg-green-500">Completed</Badge>;
       case "Cancelled":
         return <Badge variant="destructive">Cancelled</Badge>;
+      case "Partial Completed":
+        return <Badge className="bg-blue-500">Partial Completed</Badge>;
+      case "Partial Cancelled":
+        return <Badge className="bg-orange-500">Partial Cancelled</Badge>;
       default:
         return (
           <Badge
