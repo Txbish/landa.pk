@@ -59,14 +59,14 @@ An interactive and user-friendly e-commerce thrift store built using the MERN st
 
 ### ⚙️ **Clone the repository**
 ```bash
-git clone https://github.com/yourusername/thrift-store.git
-cd thrift-store
+git clone https://github.com/txbish/landa.pk.git
+cd landa.pk
 ```
 
 ### 📁 **Install dependencies**
 #### Frontend
 ```bash
-cd client
+cd landa.pk
 npm install
 ```
 #### Backend
@@ -91,7 +91,7 @@ JWT_SECRET=your_jwt_secret
 ### 🏃 **Running the application**
 #### Frontend
 ```bash
-cd client
+cd landa.pk
 npm run dev
 ```
 #### Backend
@@ -112,7 +112,7 @@ npm start
 ## 📊 **Project Structure**
 ```
 thrift-store/
-├── client/               # Frontend code
+├── landa.pk/               # Frontend code
 ├── server/               # Backend code
 ├── .gitignore
 ├── README.md
